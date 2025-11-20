@@ -139,6 +139,44 @@ Upload video otomatis ke semua platform short-form video!
 
 ---
 
+## 🎬 Video Generation (NEW!)
+
+Workflow generates **video script** - you need to add **video creation**!
+
+### Current Status
+- ✅ AI generates 60-second script with scene breakdown
+- ✅ Caption & hashtags ready
+- ✅ Thumbnail image created
+- ❌ **Need:** Actual video file (MP4)
+
+### Solution Options
+
+| Method | Cost | Setup | Quality | Automation |
+|--------|------|-------|---------|------------|
+| **Pictory.ai API** | $29-119/mo | 1 hour | ⭐⭐⭐⭐⭐ | ✅ Full |
+| **Manual (Canva/CapCut)** | Free | 10-20 min/video | ⭐⭐⭐⭐ | ❌ Manual |
+| **Hybrid Approach** | $29+/mo | Mixed | ⭐⭐⭐⭐⭐ | ⚡ Semi |
+
+### Quick Start Guides
+
+**Choose your path:**
+
+1. **🤖 Full Automation** → [Pictory.ai Integration](docs/VIDEO-GENERATION-PICTORY.md)
+   - Text-to-video otomatis
+   - AI voice-over & stock footage
+   - 2-5 minutes processing per video
+
+2. **✋ Manual Creation** → [Manual Workflow Guide](docs/VIDEO-GENERATION-MANUAL.md)
+   - Free tools: Canva, CapCut
+   - 10-20 minutes per video
+   - High quality control
+
+3. **📊 Compare All Options** → [Video Generation Options](docs/VIDEO-GENERATION-OPTIONS.md)
+
+**Integration:** [Add Video to Existing Workflow](docs/WORKFLOW-ADD-VIDEO-GENERATION.md)
+
+---
+
 ## 🏗️ Arsitektur
 
 ```
