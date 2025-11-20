@@ -1,0 +1,72 @@
+{
+  "workflow_settings": {
+    "schedule_cron": "0 8 * * *",
+    "schedule_timezone": "Asia/Jakarta",
+    "max_items_per_run": 3,
+    "enable_notifications": true
+  },
+  "api_endpoints": {
+    "news_api": "https://newsapi.org/v2/everything",
+    "wordpress_base_url": "https://your-wordpress-site.com",
+    "telegram_api": "https://api.telegram.org",
+    "huggingface_api": "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
+  },
+  "filter_keywords": [
+    "presale",
+    "web3",
+    "blockchain",
+    "AI",
+    "L2",
+    "layer 2",
+    "ecosystem",
+    "token launch",
+    "ICO",
+    "IDO",
+    "DeFi",
+    "NFT",
+    "metaverse",
+    "gaming",
+    "RWA",
+    "tokenization",
+    "airdrop",
+    "launchpad"
+  ],
+  "news_search_queries": [
+    "crypto presale",
+    "web3 presale",
+    "blockchain presale",
+    "token launch",
+    "new crypto project",
+    "IDO announcement",
+    "token sale"
+  ],
+  "content_settings": {
+    "article_min_words": 800,
+    "article_max_words": 1200,
+    "video_duration_seconds": 60,
+    "language": "id",
+    "tone": "casual_educational"
+  },
+  "social_media": {
+    "telegram_chat_id": "YOUR_TELEGRAM_CHANNEL_ID",
+    "admin_telegram_id": "YOUR_ADMIN_TELEGRAM_ID",
+    "hashtag_count": 20,
+    "enable_tiktok": false,
+    "enable_youtube": false,
+    "enable_instagram": false
+  },
+  "storage": {
+    "google_sheet_id": "YOUR_GOOGLE_SHEET_ID",
+    "archive_sheet_name": "Archive",
+    "wordpress_category_id": 1
+  },
+  "ai_models": {
+    "research_model": "gpt-4o-mini",
+    "content_generation_model": "gpt-4o-mini",
+    "image_model": "black-forest-labs/FLUX.1-schnell",
+    "research_temperature": 0.7,
+    "content_temperature": 0.8,
+    "max_tokens_research": 2000,
+    "max_tokens_content": 3000
+  }
+}

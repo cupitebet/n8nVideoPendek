@@ -1,0 +1,659 @@
+{
+  "name": "Tuyul Digital Web3 - Crypto Presale Auto Content",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger - Daily 8AM WIB",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "id": "schedule-trigger-001"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "crypto presale OR web3 presale OR blockchain presale OR token launch"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            },
+            {
+              "name": "sortBy",
+              "value": "publishedAt"
+            },
+            {
+              "name": "pageSize",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Fetch Crypto News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        470,
+        300
+      ],
+      "id": "fetch-news-001",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "news-api-credential",
+          "name": "NewsAPI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "split",
+        "fieldToSplitOut": "articles",
+        "options": {}
+      },
+      "name": "Split News Articles",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        690,
+        300
+      ],
+      "id": "split-articles-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "const keywords = ['presale', 'web3', 'blockchain', 'AI', 'L2', 'layer 2', 'ecosystem', 'token launch', 'ICO', 'IDO', 'DeFi', 'NFT', 'metaverse', 'gaming'];\n\nconst items = $input.all();\nconst filtered = [];\n\nfor (const item of items) {\n  const title = (item.json.title || '').toLowerCase();\n  const description = (item.json.description || '').toLowerCase();\n  const content = (item.json.content || '').toLowerCase();\n  \n  const combinedText = title + ' ' + description + ' ' + content;\n  \n  // Check if any keyword exists\n  const hasKeyword = keywords.some(keyword => \n    combinedText.includes(keyword.toLowerCase())\n  );\n  \n  if (hasKeyword) {\n    filtered.push(item);\n  }\n}\n\nreturn filtered;"
+      },
+      "name": "Filter Presale Web3 Topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        910,
+        300
+      ],
+      "id": "filter-presale-001"
+    },
+    {
+      "parameters": {
+        "operation": "limit",
+        "maxItems": 3,
+        "options": {}
+      },
+      "name": "Limit to Top 3",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        1130,
+        300
+      ],
+      "id": "limit-items-001"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Anda adalah analis crypto profesional yang ahli dalam riset presale token, blockchain, dan Web3 projects. Tugasmu adalah menganalisis berita tentang project crypto/presale dan menghasilkan riset mendalam dalam format JSON terstruktur."
+            },
+            {
+              "role": "user",
+              "content": "=Analisis berita berikut dan buat riset mendalam:\n\nJudul: {{ $json.title }}\nDeskripsi: {{ $json.description }}\nKonten: {{ $json.content }}\nURL: {{ $json.url }}\n\nBuat riset dalam format JSON dengan struktur:\n{\n  \"project_name\": \"nama project\",\n  \"category\": \"DeFi/GameFi/AI/L2/NFT/etc\",\n  \"value_prop\": \"value proposition utama\",\n  \"use_case\": \"use case konkret\",\n  \"narrative\": \"narrative market yang sedang trending\",\n  \"tokenomics\": {\n    \"ticker\": \"symbol token\",\n    \"chain\": \"blockchain yang digunakan\",\n    \"total_supply\": \"total supply\",\n    \"presale_price\": \"harga presale jika ada\",\n    \"vesting\": \"vesting schedule\",\n    \"allocation\": \"alokasi token\"\n  },\n  \"team\": \"informasi team/founder\",\n  \"backers\": \"investor/backers jika ada\",\n  \"roadmap\": \"roadmap singkat\",\n  \"risk_flags\": [\"list flag risiko\"],\n  \"opportunities\": [\"list peluang\"],\n  \"verdict\": \"BULLISH/NEUTRAL/BEARISH dengan alasan\",\n  \"content_angle\": \"angle konten yang menarik untuk video pendek\"\n}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 2000
+        },
+        "jsonOutput": true
+      },
+      "name": "Research Presale with AI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        1350,
+        300
+      ],
+      "id": "research-ai-001",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response jika masih string\nconst items = $input.all();\nconst processed = [];\n\nfor (const item of items) {\n  let researchData;\n  \n  // Get the AI response\n  const aiResponse = item.json.choices?.[0]?.message?.content || item.json.message?.content || '{}';\n  \n  try {\n    // Parse JSON if string\n    researchData = typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;\n  } catch (e) {\n    // If parsing fails, create minimal structure\n    researchData = {\n      project_name: \"Unknown\",\n      error: \"Failed to parse AI response\"\n    };\n  }\n  \n  // Merge with original data\n  processed.push({\n    json: {\n      ...item.json,\n      research: researchData,\n      original_url: item.json.url,\n      processed_at: new Date().toISOString()\n    }\n  });\n}\n\nreturn processed;"
+      },
+      "name": "Parse Research Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1570,
+        300
+      ],
+      "id": "parse-research-001"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Anda adalah content creator ahli yang membuat konten viral tentang crypto untuk platform TikTok, Instagram Reels, dan YouTube Shorts dalam Bahasa Indonesia yang engaging dan mudah dipahami."
+            },
+            {
+              "role": "user",
+              "content": "=Berdasarkan riset berikut, buat 3 jenis konten:\n\nRiset Data:\n{{ JSON.stringify($json.research, null, 2) }}\n\n1. ARTIKEL BLOG (panjang, SEO-friendly, 800-1000 kata):\n   - Judul clickbait tapi informatif\n   - Opening hook yang kuat\n   - Penjelasan project lengkap\n   - Analisis tokenomics\n   - Risk & opportunities\n   - Kesimpulan & verdict\n   - Call to action\n\n2. SHORT VIDEO SCRIPT (60 detik, Bahasa Indonesia casual):\n   - Hook 3 detik pertama (question/shocking statement)\n   - 3 poin utama (masing-masing 15 detik)\n   - Closing dengan CTA\n   - Sertakan visual cue untuk setiap scene\n\n3. SOCIAL MEDIA CAPTION:\n   - Instagram/TikTok caption (max 150 kata)\n   - Hashtag strategy (15-20 hashtag relevan)\n   - Emoji yang tepat\n\nFormat output dalam JSON:\n{\n  \"article\": {\n    \"title\": \"...\",\n    \"content\": \"...\",\n    \"meta_description\": \"...\",\n    \"tags\": []\n  },\n  \"video_script\": {\n    \"hook\": \"...\",\n    \"scenes\": [\n      {\"duration\": \"3s\", \"narration\": \"...\", \"visual\": \"...\"},\n      ...\n    ],\n    \"cta\": \"...\"\n  },\n  \"social_caption\": {\n    \"caption\": \"...\",\n    \"hashtags\": [],\n    \"emojis_used\": []\n  }\n}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 3000
+        },
+        "jsonOutput": true
+      },
+      "name": "Generate Content with AI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        1790,
+        300
+      ],
+      "id": "generate-content-001",
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credential",
+          "name": "OpenAI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse content generation response\nconst items = $input.all();\nconst processed = [];\n\nfor (const item of items) {\n  let contentData;\n  \n  const aiResponse = item.json.choices?.[0]?.message?.content || item.json.message?.content || '{}';\n  \n  try {\n    contentData = typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;\n  } catch (e) {\n    contentData = {\n      error: \"Failed to parse content\"\n    };\n  }\n  \n  processed.push({\n    json: {\n      ...item.json,\n      generated_content: contentData,\n      ready_for_publish: true\n    }\n  });\n}\n\nreturn processed;"
+      },
+      "name": "Parse Generated Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2010,
+        300
+      ],
+      "id": "parse-content-001"
+    },
+    {
+      "parameters": {
+        "url": "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inputs",
+              "value": "=Futuristic crypto project visualization: {{ $json.research.project_name }}, {{ $json.research.category }}, {{ $json.research.narrative }}, modern tech aesthetic, blockchain visualization, web3 graphics, vibrant colors, professional marketing image, 16:9 ratio"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "name": "Generate Image with Flux AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2230,
+        300
+      ],
+      "id": "generate-image-001",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "huggingface-credential",
+          "name": "HuggingFace Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $('Parse Generated Content').item.json.wordpress_url }}/wp-json/wp/v2/media",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"{{ $json.research.project_name.replace(/[^a-z0-9]/gi, '-').toLowerCase() }}.png\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "options": {}
+      },
+      "name": "Upload Image to WordPress",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2450,
+        300
+      ],
+      "id": "upload-image-wp-001",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wordpress-credential",
+          "name": "WordPress Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Parse Generated Content').item.json.wordpress_url }}/wp-json/wp/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $json.generated_content.article.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.generated_content.article.content }}"
+            },
+            {
+              "name": "status",
+              "value": "publish"
+            },
+            {
+              "name": "featured_media",
+              "value": "={{ $('Upload Image to WordPress').item.json.id }}"
+            },
+            {
+              "name": "categories",
+              "value": "[1]"
+            },
+            {
+              "name": "meta_description",
+              "value": "={{ $json.generated_content.article.meta_description }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Publish Article to WordPress",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2670,
+        300
+      ],
+      "id": "publish-wordpress-001",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wordpress-credential",
+          "name": "WordPress Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Generated Content').item.json.telegram_chat_id }}",
+        "text": "=🚀 *{{ $json.research.project_name }}* - {{ $json.research.category }}\n\n{{ $json.generated_content.social_caption.caption }}\n\n🔗 Baca artikel lengkap: {{ $json.link }}\n\n{{ $json.generated_content.social_caption.hashtags.join(' ') }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Publish to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2670,
+        480
+      ],
+      "id": "publish-telegram-001",
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credential",
+          "name": "Telegram Bot Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "={{ $('Parse Generated Content').item.json.google_sheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Archive"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ new Date().toISOString().split('T')[0] }}",
+            "project_name": "={{ $json.research.project_name }}",
+            "category": "={{ $json.research.category }}",
+            "verdict": "={{ $json.research.verdict }}",
+            "chain": "={{ $json.research.tokenomics.chain }}",
+            "ticker": "={{ $json.research.tokenomics.ticker }}",
+            "article_url": "={{ $json.link }}",
+            "original_news_url": "={{ $json.original_url }}",
+            "risk_flags": "={{ $json.research.risk_flags.join(', ') }}",
+            "opportunities": "={{ $json.research.opportunities.join(', ') }}"
+          }
+        },
+        "options": {}
+      },
+      "name": "Archive to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        2670,
+        660
+      ],
+      "id": "archive-sheets-001",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential",
+          "name": "Google Sheets Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Generated Content').item.json.admin_telegram_id }}",
+        "text": "=✅ *Konten Berhasil Dipublish!*\n\n📋 Project: *{{ $json.research.project_name }}*\n📊 Category: {{ $json.research.category }}\n🎯 Verdict: {{ $json.research.verdict }}\n\n📝 Article: {{ $json.link }}\n📱 Telegram: Published\n💾 Archived: Yes\n\n⏰ {{ new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) }} WIB",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Send Admin Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2890,
+        300
+      ],
+      "id": "notification-admin-001",
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credential",
+          "name": "Telegram Bot Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.generated_content }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Check Content Valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2230,
+        500
+      ],
+      "id": "check-content-001"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - Daily 8AM WIB": {
+      "main": [
+        [
+          {
+            "node": "Fetch Crypto News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Crypto News": {
+      "main": [
+        [
+          {
+            "node": "Split News Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split News Articles": {
+      "main": [
+        [
+          {
+            "node": "Filter Presale Web3 Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Presale Web3 Topics": {
+      "main": [
+        [
+          {
+            "node": "Limit to Top 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit to Top 3": {
+      "main": [
+        [
+          {
+            "node": "Research Presale with AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Presale with AI": {
+      "main": [
+        [
+          {
+            "node": "Parse Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Research Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Content with AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Content with AI": {
+      "main": [
+        [
+          {
+            "node": "Parse Generated Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Generated Content": {
+      "main": [
+        [
+          {
+            "node": "Check Content Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Content Valid": {
+      "main": [
+        [
+          {
+            "node": "Generate Image with Flux AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image with Flux AI": {
+      "main": [
+        [
+          {
+            "node": "Upload Image to WordPress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image to WordPress": {
+      "main": [
+        [
+          {
+            "node": "Publish Article to WordPress",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Publish to Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Archive to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Article to WordPress": {
+      "main": [
+        [
+          {
+            "node": "Send Admin Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-20T03:22:00.000Z",
+      "updatedAt": "2025-11-20T03:22:00.000Z",
+      "id": "1",
+      "name": "crypto"
+    },
+    {
+      "createdAt": "2025-11-20T03:22:00.000Z",
+      "updatedAt": "2025-11-20T03:22:00.000Z",
+      "id": "2",
+      "name": "automation"
+    },
+    {
+      "createdAt": "2025-11-20T03:22:00.000Z",
+      "updatedAt": "2025-11-20T03:22:00.000Z",
+      "id": "3",
+      "name": "content-creation"
+    }
+  ],
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "tuyul-digital-web3-v1"
+  }
+}
