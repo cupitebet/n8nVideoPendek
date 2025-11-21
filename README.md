@@ -139,41 +139,101 @@ Upload video otomatis ke semua platform short-form video!
 
 ---
 
-## 🎬 Video Generation (NEW!)
+## 🎬 **IMPORTANT: Video Generation Gap!**
 
-Workflow generates **video script** - you need to add **video creation**!
+### ⚠️ Current Workflow Status
 
-### Current Status
-- ✅ AI generates 60-second script with scene breakdown
+**What's Automated:**
+- ✅ AI generates 60-second script
+- ✅ Script broken down per scene (5-8 detik each)
 - ✅ Caption & hashtags ready
 - ✅ Thumbnail image created
-- ❌ **Need:** Actual video file (MP4)
 
-### Solution Options
+**What's NOT Automated Yet:**
+- ❌ **Auto-generate actual video file (MP4) from script**
+- ❌ **Combine scenes into 1-minute video**
 
-| Method | Cost | Setup | Quality | Automation |
-|--------|------|-------|---------|------------|
-| **Pictory.ai API** | $29-119/mo | 1 hour | ⭐⭐⭐⭐⭐ | ✅ Full |
-| **Manual (Canva/CapCut)** | Free | 10-20 min/video | ⭐⭐⭐⭐ | ❌ Manual |
-| **Hybrid Approach** | $29+/mo | Mixed | ⭐⭐⭐⭐⭐ | ⚡ Semi |
+### 🎯 What You Need
 
-### Quick Start Guides
+Script structure yang di-generate:
+```javascript
+{
+  "scenes": [
+    { "duration": "0-3s", "narration": "Hook text...", "visual": "..." },
+    { "duration": "3-20s", "narration": "Scene 1...", "visual": "..." },
+    { "duration": "20-40s", "narration": "Scene 2...", "visual": "..." },
+    { "duration": "40-55s", "narration": "Scene 3...", "visual": "..." },
+    { "duration": "55-60s", "narration": "CTA...", "visual": "..." }
+  ]
+}
+```
 
-**Choose your path:**
+**Need to convert this → MP4 file (1080x1920, 60 seconds)**
 
-1. **🤖 Full Automation** → [Pictory.ai Integration](docs/VIDEO-GENERATION-PICTORY.md)
-   - Text-to-video otomatis
-   - AI voice-over & stock footage
-   - 2-5 minutes processing per video
+### 🤖 Auto Video Generation Solutions
 
-2. **✋ Manual Creation** → [Manual Workflow Guide](docs/VIDEO-GENERATION-MANUAL.md)
-   - Free tools: Canva, CapCut
-   - 10-20 minutes per video
-   - High quality control
+| Method | How It Works | Cost | Setup | Automation |
+|--------|--------------|------|-------|------------|
+| **Pictory.ai** | API auto-generates video from script scenes | $29-119/mo | 1 hour | ✅ **100% Auto** |
+| **Remotion** | React-based programmatic video | Free | 2-3 hours | ✅ **100% Auto** |
+| **FFmpeg + Templates** | Script → Template → Video | Free | 3-5 hours | ✅ **100% Auto** |
+| **Manual (Canva)** | You create video per scene manually | Free | 15-20 min | ❌ Manual |
 
-3. **📊 Compare All Options** → [Video Generation Options](docs/VIDEO-GENERATION-OPTIONS.md)
+### 🚀 Recommended: Pictory.ai (Easiest)
 
-**Integration:** [Add Video to Existing Workflow](docs/WORKFLOW-ADD-VIDEO-GENERATION.md)
+**How it works:**
+1. Workflow generates script (5 scenes @ 5-12 seconds each)
+2. Auto-convert to Pictory API format
+3. Pictory generates video per scene
+4. Auto-combines into 60-second video
+5. Download MP4 → Upload to platforms
+
+**Complete workflow:**
+```
+[AI Generate Script with Scenes]
+    ↓
+[Convert to Pictory Format]
+    ↓
+[Pictory API: Generate Video]  ← 2-5 min automated
+    ↓
+[Download MP4 (1080x1920)]
+    ↓
+[Upload to S3/Cloudinary]
+    ↓
+[Multi-Platform Publish]
+```
+
+### 📚 Implementation Guides
+
+**1. Full Automation (Recommended):**
+- 🤖 [Pictory.ai Auto Video Generation](docs/VIDEO-GENERATION-PICTORY.md)
+  - Scene-by-scene automation
+  - Auto voice-over per scene
+  - Auto stock footage matching
+  - Auto combine into 60s video
+
+**2. Alternative Auto Solutions:**
+- 🎨 [Remotion Programmatic Video](docs/VIDEO-GENERATION-REMOTION.md) *(coming soon)*
+- 🛠️ [FFmpeg Template-Based](docs/VIDEO-GENERATION-FFMPEG.md) *(coming soon)*
+
+**3. Manual Testing (Free):**
+- ✋ [Manual Scene-by-Scene Creation](docs/VIDEO-GENERATION-MANUAL.md)
+- ✋ [Today's Quick Test](docs/TODAY-MANUAL-VIDEO-TEST.md)
+
+**4. Integration:**
+- 🔧 [Add Auto Video to Workflow](docs/WORKFLOW-ADD-VIDEO-GENERATION.md)
+
+### 💡 Quick Decision
+
+**Want automation now?**
+→ Use [Pictory.ai](docs/VIDEO-GENERATION-PICTORY.md) ($29/mo)
+→ Setup time: 1 hour
+→ Result: 100% automated script → video → publish
+
+**Budget-conscious?**
+→ Start with [Manual](docs/TODAY-MANUAL-VIDEO-TEST.md) (free)
+→ Create 1 video today (30 min)
+→ Upgrade to automation later
 
 ---
 
