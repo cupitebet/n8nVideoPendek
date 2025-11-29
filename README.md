@@ -10,6 +10,7 @@
 
 - [Overview](#overview)
 - [Features](#features)
+- [Majelis.info Digital Marketing](#majelisinfo-digital-marketing)
 - [Quick Start](#quick-start)
 - [Arsitektur](#arsitektur)
 - [Installation](#installation)
@@ -38,6 +39,15 @@
 6. 💾 **Archive** ke Google Sheets untuk tracking
 
 **Goal:** Konten edukasi crypto berkualitas, konsisten, dan viral - tanpa manual work!
+
+## 🌐 Majelis.info Digital Marketing
+
+Paket baru untuk orkestrasi **digital marketing Majelis.info** berbasis CometAPI:
+
+- Workflow n8n siap pakai: `workflows/majelis-digital-marketing.json` (branch model Nano/Veo/Sora dengan Google Sheets + CometAPI + OpenAI Vision)
+- Catatan konsep & eksekusi: [docs/MAJELIS-DIGITAL-MARKETING.md](docs/MAJELIS-DIGITAL-MARKETING.md)
+- Fokus: riset topik → prompt UGC selfie → render gambar/video → CTA chatbot (WA/DM) + distribusi ke Reels/TikTok/Shorts
+- Cara pakai singkat: duplikat template Google Sheet, import workflow ke n8n, sambungkan kredensial `Google Sheets account 2`, `cometapi`, dan `CometAPI`, lalu jalankan 1 baris test untuk mengisi kolom `Finished Video`.
 
 ---
 
@@ -95,7 +105,7 @@ docker run -d --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
 # Akses: http://localhost:5678
 
 # 4. Import workflow
-# Upload file: workflows/tuyul-digital-web3.json
+# Upload file: workflows/majelis-digital-marketing.json
 
 # 5. Setup credentials (minimal):
 # - OpenAI API Key
