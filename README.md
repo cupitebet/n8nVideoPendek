@@ -29,7 +29,7 @@
 **Tuyul Digital Web3** adalah workflow n8n yang sepenuhnya otomatis untuk:
 
 1. 📰 **Fetch** berita terbaru tentang crypto presale, blockchain, Web3
-2. 🤖 **Research** otomatis dengan AI (GPT-4o-mini)
+2. 🤖 **Research** otomatis dengan AI (DeepSeek R1/V3)
 3. ✍️ **Generate** konten multi-format:
    - Artikel blog lengkap (800-1000 kata)
    - Script video pendek 60 detik (TikTok/Reels/Shorts)
@@ -72,7 +72,7 @@ Paket baru untuk orkestrasi **digital marketing Majelis.info** berbasis CometAPI
 
 **Content Generation:**
 - 🔗 NewsAPI (berita crypto)
-- 🧠 OpenAI GPT-4o-mini (research & content)
+- 🧠 DeepSeek AI (research & content) - *Cheaper & Cooler!*
 - 🎨 HuggingFace Flux AI (gambar)
 
 **Publishing Platforms:**
@@ -108,7 +108,7 @@ docker run -d --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
 # Upload file: workflows/majelis-digital-marketing.json
 
 # 5. Setup credentials (minimal):
-# - OpenAI API Key
+# - DeepSeek API Key (via OpenAI credential)
 # - NewsAPI Key
 
 # 6. Test run!
@@ -347,10 +347,10 @@ Edit di `config/settings.json`:
 ```json
 {
   "ai_models": {
-    "research_model": "gpt-4o-mini",
-    "content_generation_model": "gpt-4o-mini",
-    "research_temperature": 0.7,
-    "content_temperature": 0.8
+    "research_model": "deepseek-reasoner",
+    "content_generation_model": "deepseek-chat",
+    "research_temperature": 0.6,
+    "content_temperature": 1.0
   }
 }
 ```
@@ -408,15 +408,15 @@ Cron expressions:
 ### Monthly Cost (Estimasi)
 
 **Minimal Setup (1 artikel/hari):**
-- OpenAI GPT-4o-mini: ~$3-5/bulan
+- DeepSeek AI: ~$0.5-1/bulan (Sangat Murah!)
 - NewsAPI Free Tier: $0
-- **Total: $3-5/bulan**
+- **Total: $0.5-1/bulan**
 
 **Full Setup (3 artikel/hari + gambar):**
-- OpenAI GPT-4o-mini: ~$10-15/bulan
+- DeepSeek AI: ~$1-2/bulan
 - NewsAPI Free Tier: $0
 - HuggingFace Free: $0 (rate limited)
-- **Total: $10-15/bulan**
+- **Total: $1-2/bulan**
 
 **Pro Setup:**
 - OpenAI GPT-4o: ~$50-100/bulan
@@ -427,10 +427,10 @@ Cron expressions:
 **Recommendation:** Mulai dari Minimal Setup, scale up sesuai kebutuhan.
 
 ### Per-Execution Cost
-- Research (GPT-4o-mini): ~$0.0003
-- Content Gen (GPT-4o-mini): ~$0.0005
+- Research (DeepSeek R1): ~$0.00005
+- Content Gen (DeepSeek V3): ~$0.00002
 - Image (Flux): $0 (free tier, limited)
-- **Total per run:** ~$0.001 (1 artikel)
+- **Total per run:** ~$0.0001 (1 artikel)
 
 ---
 
