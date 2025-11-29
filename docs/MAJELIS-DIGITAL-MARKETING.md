@@ -49,6 +49,20 @@ Catatan konseptual dari perspektif **Marketing Manager + AI Engineer** untuk men
 4) Jalankan manual untuk 1 baris test → cek kolom `Finished Video` terisi.
 5) Sambungkan modul posting sosial & webhook chatbot untuk CTA.
 
+### Setup Teknis (kredensial & environment)
+- **Google Sheets OAuth2** → pastikan nama kredensial di n8n sama seperti di node (`Google Sheets account 2`).
+- **CometAPI (HTTP Header Auth)** → isi header `Authorization: Bearer <API_KEY>` pada kredensial bernama `cometapi` untuk semua node HTTP Request.
+- **OpenAI / OpenRouter** → kredensial bernama `CometAPI` dipakai oleh node Analyze Image & LM Chat (pastikan API key aktif dan model tersedia).
+- **Variabel lingkungan** (opsional) → gunakan `N8N_GENERIC_TIMEZONE=Asia/Jakarta` agar waktu cron sesuai.
+- **Rate limit/polling** → node `Wait` sudah disetel untuk polling task ID; sesuaikan `amount` jika API sering throttling.
+
+### Runbook Operasional
+1. **Pengisian data**: gunakan 1 baris per produk/kampanye di Sheet; set kolom `Model` sesuai kebutuhan (Veo / Nano+Veo / Sora).
+2. **Trigger**: jalankan manual atau aktifkan Schedule Trigger (atur interval di node Schedule Trigger → Rule Interval).
+3. **Monitoring**: cek Execution di n8n; jika status gagal, lihat node HTTP Request untuk pesan error dari CometAPI.
+4. **QA**: gunakan hasil `Analyze image` untuk validasi otomatis; tambahkan filter If untuk reject konten yang tidak sesuai brand.
+5. **Distribusi**: setelah `Finished Video` terisi, pipeline sosial dapat menarik URL tersebut dan push ke kanal Reels/TikTok/Shorts.
+
 ## 8) Ide Iterasi Lanjut
 - Tambah **topic research** otomatis (Google Trends/SerpAPI) untuk Majelis.info.
 - Buat **persona bank** (jamaah, donatur, volunteer) dan mapping ke ICP.
