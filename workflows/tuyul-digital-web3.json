@@ -114,7 +114,7 @@
         "model": {
           "__rl": true,
           "mode": "list",
-          "value": "gpt-4o-mini"
+          "value": "deepseek-reasoner"
         },
         "messages": {
           "values": [
@@ -169,7 +169,7 @@
         "model": {
           "__rl": true,
           "mode": "list",
-          "value": "gpt-4o-mini"
+          "value": "deepseek-chat"
         },
         "messages": {
           "values": [
