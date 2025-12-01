@@ -1,0 +1,197 @@
+{
+  "name": "Character Generator - Blueprint V2",
+  "nodes": [
+    {
+      "parameters": {
+        "character_name": "={{ $json.character_name }}",
+        "character_description": "={{ $json.character_description }}"
+      },
+      "id": "manual-trigger",
+      "name": "Manual Trigger - Character Input",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileContent": "={{ $node['Read Character Template'].binary.data }}"
+      },
+      "id": "read-template",
+      "name": "Read Character Template",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [250, 100],
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Load template dan replace placeholders\nconst template = $node['Read Character Template'].item.json.template;\nconst name = $input.item.json.character_name;\nconst desc = $input.item.json.character_description;\n\n// Parse description untuk extract details\nconst details = desc.split(',').map(d => d.trim());\n\n// Build prompt dari template\nlet prompt = template.replace('[CHARACTER_NAME]', name);\n\n// Tambahkan description details\nprompt = prompt.replace('[Description]', desc);\n\nreturn {\n  json: {\n    character_name: name,\n    prompt: prompt,\n    description: desc\n  }\n};"
+      },
+      "id": "build-prompt",
+      "name": "Build Character Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "notes": "Generate prompt dari template"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents",
+              "value": "={{ [{\"parts\": [{\"text\": $json.prompt}]}] }}"
+            },
+            {
+              "name": "generationConfig",
+              "value": "={{ {\"temperature\": 0.4, \"topK\": 32, \"topP\": 1} }}"
+            }
+          ]
+        }
+      },
+      "id": "generate-character-sheet",
+      "name": "Generate Character Sheet (Gemini Flash)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300],
+      "notes": "Generate character sheet image"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract image dari response\nconst response = $input.item.json;\nconst imageData = response.candidates[0].content.parts[0].inlineData;\n\n// Convert ke binary\nconst binaryData = Buffer.from(imageData.data, 'base64');\n\nconst characterName = $input.item.json.character_name.toLowerCase().replace(/\\s+/g, '_');\n\nreturn {\n  json: {\n    character_name: $input.item.json.character_name,\n    description: $input.item.json.description,\n    image_generated: true,\n    filename: `character_${characterName}_sheet.png`\n  },\n  binary: {\n    image: {\n      data: binaryData.toString('base64'),\n      mimeType: imageData.mimeType,\n      fileName: `character_${characterName}_sheet.png`\n    }\n  }\n};"
+      },
+      "id": "process-image",
+      "name": "Process Character Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300],
+      "notes": "Convert image data"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $env.GCS_BUCKET_NAME }}",
+        "fileName": "={{ 'characters/' + $json.filename }}",
+        "binaryData": true,
+        "binaryPropertyName": "image",
+        "options": {
+          "makePublic": true
+        }
+      },
+      "id": "upload-to-gcs",
+      "name": "Upload to Cloud Storage",
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "1",
+          "name": "Google Cloud Storage account"
+        }
+      },
+      "notes": "Save character sheet to GCS"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format final output\nconst bucketName = $env.GCS_BUCKET_NAME;\nconst filename = $input.item.json.filename;\n\nreturn {\n  json: {\n    status: 'completed',\n    character_name: $input.item.json.character_name,\n    description: $input.item.json.description,\n    storage_uri: `gs://${bucketName}/characters/${filename}`,\n    public_url: `https://storage.googleapis.com/${bucketName}/characters/${filename}`,\n    created_at: new Date().toISOString(),\n    usage_tip: 'Use storage_uri in Veo 3.1 image_storage_uri parameter for character consistency'\n  }\n};"
+      },
+      "id": "format-output",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "notes": "Provide URIs untuk use di main workflow"
+    }
+  ],
+  "connections": {
+    "Manual Trigger - Character Input": {
+      "main": [
+        [
+          {
+            "node": "Build Character Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Character Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Character Sheet (Gemini Flash)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Character Sheet (Gemini Flash)": {
+      "main": [
+        [
+          {
+            "node": "Process Character Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Character Image": {
+      "main": [
+        [
+          {
+            "node": "Upload to Cloud Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Cloud Storage": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Blueprint V2",
+      "id": "blueprint-v2"
+    },
+    {
+      "name": "Character Generator",
+      "id": "character-gen"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-01T10:00:00.000Z",
+  "versionId": "1"
+}

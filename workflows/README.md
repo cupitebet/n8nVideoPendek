@@ -2,7 +2,7 @@
 
 ## Available Workflows
 
-### 1. youtube-shorts-veo-v2.json (COMING SOON)
+### 1. youtube-shorts-veo-v2.json ✅
 
 **Full automation workflow** untuk YouTube Shorts menggunakan:
 - Google Veo 3.1 (video generation)
@@ -10,7 +10,7 @@
 - Gemini 1.5 Pro (script generation)
 - Creatomate (video assembly)
 
-**Status:** 🚧 In development
+**Status:** ✅ Available
 
 **What it does:**
 1. Input: Topic (e.g., "AI Gaming Revolution")
@@ -23,24 +23,11 @@
 
 ---
 
-### 2. youtube-shorts-manual.json (COMING SOON)
-
-**Semi-manual workflow** untuk beginners.
-
-**What it does:**
-1. Input: Topic
-2. Generate script
-3. Generate character images
-4. Save to Google Drive
-5. **STOP** - You manually create video
-
-Good for learning the process!
-
----
-
-### 3. character-generator.json (COMING SOON)
+### 2. character-generator.json ✅
 
 **Standalone workflow** untuk membuat character sheets.
+
+**Status:** ✅ Available
 
 **What it does:**
 1. Input: Character description
@@ -50,14 +37,27 @@ Good for learning the process!
 
 ---
 
-## How to Import
+## Complete Setup Guide
 
-1. Download workflow JSON file
-2. Open n8n
-3. Click **Workflows** menu
-4. Click **Import from File**
-5. Select JSON file
-6. Click **Import**
+**📖 See detailed setup instructions:** [Workflow Setup Guide](../docs/WORKFLOW-SETUP.md)
+
+Quick overview:
+
+### Step 1: Setup Environment Variables
+```bash
+cp config/environment-variables.env.example .env
+# Edit .env dengan your values
+```
+
+### Step 2: Import Workflows
+
+1. Open n8n
+2. Click **Workflows** menu
+3. Click **Import from File**
+4. Select workflow JSON:
+   - `youtube-shorts-veo-v2.json` (main workflow)
+   - `character-generator.json` (character tool)
+5. Click **Import**
 
 ---
 
