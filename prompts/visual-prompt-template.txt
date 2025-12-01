@@ -1,0 +1,84 @@
+[CHARACTER_NAME], [CHARACTER_KEY_FEATURES], [ACTION_DESCRIPTION], [CAMERA_ANGLE], [LIGHTING], [MOOD], [ART_STYLE]
+
+---
+
+STRUCTURE BREAKDOWN:
+
+1. CHARACTER_NAME:
+   - Use consistent name across all prompts
+   - Example: "Alex", "Dr. Chen", "Zara"
+
+2. CHARACTER_KEY_FEATURES:
+   - Physical description that matches character sheet
+   - Example: "young Asian male with round glasses and red gaming hoodie"
+   - ALWAYS mention: age/ethnicity, distinctive features, clothing
+
+3. ACTION_DESCRIPTION:
+   - What the character is doing
+   - Be specific and vivid
+   - Example: "frantically typing on mechanical keyboard with intense focus, sweat on forehead"
+
+4. CAMERA_ANGLE:
+   - close-up / extreme close-up (face only)
+   - medium shot (waist up)
+   - full shot (entire body)
+   - over-shoulder
+   - point-of-view (POV)
+   - wide shot / establishing shot
+   - low angle (looking up)
+   - high angle (looking down)
+   - dutch angle (tilted)
+
+5. LIGHTING:
+   - natural daylight
+   - golden hour warm glow
+   - blue screen glow
+   - dramatic rim lighting
+   - soft diffused lighting
+   - harsh spotlight
+   - neon lights
+   - candlelight
+   - studio lighting
+
+6. MOOD:
+   - intense / tense / suspenseful
+   - peaceful / calm / serene
+   - chaotic / frantic / overwhelming
+   - triumphant / victorious
+   - mysterious / ominous
+   - energetic / dynamic
+   - melancholic / sad
+
+7. ART_STYLE:
+   - photorealistic style
+   - 3D rendered style
+   - anime style
+   - digital illustration
+   - cinematic film style
+   - documentary style
+
+---
+
+EXAMPLES:
+
+Example 1 (Intense Gaming Scene):
+Alex, young Asian male with round glasses and red gaming hoodie, frantically typing on mechanical keyboard with drops of sweat on forehead and intense focused expression, over-shoulder close-up shot showing his hands and multiple monitors in background, blue screen glow with dramatic rim lighting from behind, tense and chaotic mood, photorealistic cinematic style
+
+Example 2 (Victorious Moment):
+Same character Alex wearing red hoodie and glasses, jumping up from chair with arms raised in victory celebration, fists pumped in air with huge smile, medium shot from slightly low angle, warm golden lighting streaming through window, triumphant and energetic mood, photorealistic cinematic style
+
+Example 3 (Problem Discovery):
+Alex in his signature red gaming hoodie and round glasses, staring at screen with shocked expression and jaw dropped, hand covering mouth, extreme close-up on face showing wide eyes behind glasses with screen reflection, harsh blue monitor light creating dramatic shadows, ominous and tense mood, photorealistic cinematic style
+
+Example 4 (Collaborative Scene - Multiple Characters):
+Alex (young Asian male, red hoodie, glasses) sitting next to Zara (Latina female, purple hair, black jacket), both pointing at shared screen with excited expressions, medium two-shot from front, warm cafe ambient lighting with laptop screen glow, energetic collaborative mood, photorealistic style
+
+---
+
+TIPS FOR CONSISTENCY:
+
+1. Always use "same character [NAME]" in subsequent prompts after first scene
+2. Mention at least 2-3 distinctive features every time (e.g., "glasses and red hoodie")
+3. Keep art style keyword identical across all scenes
+4. Reference previous successful prompts
+5. If character has accessories, mention them every time

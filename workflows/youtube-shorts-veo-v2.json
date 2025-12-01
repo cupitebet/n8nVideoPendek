@@ -1,0 +1,436 @@
+{
+  "name": "YouTube Shorts - Blueprint V2 (Veo 3.1)",
+  "nodes": [
+    {
+      "parameters": {
+        "topic": "={{ $json.topic }}"
+      },
+      "id": "manual-trigger",
+      "name": "Manual Trigger - Input Topic",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents",
+              "value": "={{ [{\"parts\": [{\"text\": \"Topic: \" + $json.topic + \"\\n\\nGenerate a 60-second YouTube Shorts script following the Conflict Arc structure.\"}]}] }}"
+            },
+            {
+              "name": "systemInstruction",
+              "value": "={{ $('Read Director Prompt').item.json.prompt }}"
+            }
+          ]
+        }
+      },
+      "id": "director-gemini",
+      "name": "The Director (Gemini 1.5 Pro)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "notes": "Generate script dengan Conflict Arc structure"
+    },
+    {
+      "parameters": {
+        "fileContent": "={{ $node['Read Director Prompt'].binary.data }}"
+      },
+      "id": "read-director-prompt",
+      "name": "Read Director Prompt",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [250, 100],
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Gemini response\nconst response = $input.item.json;\nconst scriptText = response.candidates[0].content.parts[0].text;\n\n// Parse JSON dari response\nconst script = JSON.parse(scriptText);\n\n// Prepare output\nreturn {\n  json: {\n    title: script.title,\n    scenes: script.scenes,\n    metadata: script.metadata || {},\n    totalScenes: script.scenes.length\n  }\n};"
+      },
+      "id": "parse-script",
+      "name": "Parse Script Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "notes": "Extract dan parse JSON script"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "scenes",
+        "options": {}
+      },
+      "id": "split-scenes",
+      "name": "Split Into Scenes",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "notes": "Split jadi individual scenes untuk processing"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents",
+              "value": "={{ [{\"parts\": [{\"text\": $json.visual_prompt}]}] }}"
+            },
+            {
+              "name": "generationConfig",
+              "value": "={{ {\"temperature\": 0.4, \"topK\": 32, \"topP\": 1} }}"
+            }
+          ]
+        }
+      },
+      "id": "generate-images",
+      "name": "Generate Scene Images (Gemini Flash)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300],
+      "notes": "Generate images untuk setiap scene"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract base64 image dari Gemini response\nconst response = $input.item.json;\nconst imageData = response.candidates[0].content.parts[0].inlineData;\n\n// Convert ke binary\nconst binaryData = Buffer.from(imageData.data, 'base64');\n\nreturn {\n  json: {\n    scene_number: $input.item.json.scene_number,\n    visual_prompt: $input.item.json.visual_prompt,\n    sound_effect_prompt: $input.item.json.sound_effect_prompt,\n    voiceover_script: $input.item.json.voiceover_script,\n    duration_seconds: $input.item.json.duration_seconds,\n    image_ready: true\n  },\n  binary: {\n    image: {\n      data: binaryData.toString('base64'),\n      mimeType: imageData.mimeType,\n      fileName: `scene_${$input.item.json.scene_number}.png`\n    }\n  }\n};"
+      },
+      "id": "process-image",
+      "name": "Process Image Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "notes": "Convert image response ke binary"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $env.GCS_BUCKET_NAME }}",
+        "fileName": "={{ 'scenes/scene_' + $json.scene_number + '_' + Date.now() + '.png' }}",
+        "binaryData": true,
+        "binaryPropertyName": "image"
+      },
+      "id": "upload-to-gcs",
+      "name": "Upload to Google Cloud Storage",
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [1450, 300],
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "1",
+          "name": "Google Cloud Storage account"
+        }
+      },
+      "notes": "Save images ke GCS untuk Veo 3.1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://us-central1-aiplatform.googleapis.com/v1/projects/' + $env.GCP_PROJECT_ID + '/locations/us-central1/publishers/google/models/veo-003-1:predict' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "instances",
+              "value": "={{ [{\"prompt\": $json.visual_prompt, \"image_storage_uri\": $json.gcs_uri, \"audio_prompt\": $json.sound_effect_prompt}] }}"
+            },
+            {
+              "name": "parameters",
+              "value": "={{ {\"sampleCount\": 1, \"videoLength\": \"5s\", \"aspectRatio\": \"9:16\", \"imageControlMode\": \"character_reference\"} }}"
+            }
+          ]
+        }
+      },
+      "id": "generate-video-veo",
+      "name": "Generate Video (Veo 3.1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1650, 300],
+      "notes": "Generate video clips dengan Veo 3.1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract video URI dari Veo response\nconst response = $input.item.json;\nconst videoUri = response.predictions[0].videoUri;\n\nreturn {\n  json: {\n    scene_number: $input.item.json.scene_number,\n    video_uri: videoUri,\n    voiceover_script: $input.item.json.voiceover_script,\n    duration_seconds: $input.item.json.duration_seconds,\n    status: 'video_generated'\n  }\n};"
+      },
+      "id": "process-video",
+      "name": "Process Video Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1850, 300],
+      "notes": "Extract video URLs"
+    },
+    {
+      "parameters": {
+        "operation": "aggregateItems",
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "scenes"
+      },
+      "id": "aggregate-scenes",
+      "name": "Aggregate All Scenes",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [2050, 300],
+      "notes": "Combine semua scene videos"
+    },
+    {
+      "parameters": {
+        "voice": "en-US-Journey-D",
+        "text": "={{ $json.scenes.map(s => s.voiceover_script).join(' ') }}",
+        "options": {
+          "speakingRate": 1.1
+        }
+      },
+      "id": "generate-voiceover",
+      "name": "Generate Voiceover (Cloud TTS)",
+      "type": "n8n-nodes-base.googleCloudTextToSpeech",
+      "typeVersion": 1,
+      "position": [2250, 300],
+      "credentials": {
+        "googleCloudTextToSpeechOAuth2Api": {
+          "id": "2",
+          "name": "Google Cloud TTS account"
+        }
+      },
+      "notes": "Generate narration audio"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.creatomate.com/v1/renders",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.CREATOMATE_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_id",
+              "value": "={{ $env.CREATOMATE_TEMPLATE_ID }}"
+            },
+            {
+              "name": "modifications",
+              "value": "={{ {\"video-clips\": $json.scenes.map(s => s.video_uri), \"voiceover\": $json.voiceover_uri} }}"
+            }
+          ]
+        }
+      },
+      "id": "assemble-final-video",
+      "name": "Assemble Final Video (Creatomate)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2450, 300],
+      "notes": "Combine clips, add subtitles, add music"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Final output formatting\nconst response = $input.item.json;\n\nreturn {\n  json: {\n    status: 'completed',\n    title: $input.item.json.title,\n    final_video_url: response.url,\n    render_id: response.id,\n    duration: $input.item.json.scenes.reduce((sum, s) => sum + s.duration_seconds, 0),\n    scenes_count: $input.item.json.scenes.length,\n    created_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "format-output",
+      "name": "Format Final Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2650, 300],
+      "notes": "Format final output metadata"
+    }
+  ],
+  "connections": {
+    "Manual Trigger - Input Topic": {
+      "main": [
+        [
+          {
+            "node": "The Director (Gemini 1.5 Pro)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The Director (Gemini 1.5 Pro)": {
+      "main": [
+        [
+          {
+            "node": "Parse Script Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Script Output": {
+      "main": [
+        [
+          {
+            "node": "Split Into Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Scenes": {
+      "main": [
+        [
+          {
+            "node": "Generate Scene Images (Gemini Flash)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Scene Images (Gemini Flash)": {
+      "main": [
+        [
+          {
+            "node": "Process Image Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Image Data": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Cloud Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Cloud Storage": {
+      "main": [
+        [
+          {
+            "node": "Generate Video (Veo 3.1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video (Veo 3.1)": {
+      "main": [
+        [
+          {
+            "node": "Process Video Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Video Output": {
+      "main": [
+        [
+          {
+            "node": "Aggregate All Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate All Scenes": {
+      "main": [
+        [
+          {
+            "node": "Generate Voiceover (Cloud TTS)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Voiceover (Cloud TTS)": {
+      "main": [
+        [
+          {
+            "node": "Assemble Final Video (Creatomate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Final Video (Creatomate)": {
+      "main": [
+        [
+          {
+            "node": "Format Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Blueprint V2",
+      "id": "blueprint-v2"
+    },
+    {
+      "name": "YouTube Shorts",
+      "id": "youtube-shorts"
+    },
+    {
+      "name": "Veo 3.1",
+      "id": "veo-31"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-01T10:00:00.000Z",
+  "versionId": "1"
+}

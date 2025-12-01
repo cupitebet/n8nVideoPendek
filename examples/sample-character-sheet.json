@@ -1,0 +1,100 @@
+{
+  "character": {
+    "name": "Alex Chen",
+    "purpose": "Main protagonist for gaming/tech YouTube Shorts",
+    "demographics": {
+      "age": 22,
+      "gender": "Male",
+      "ethnicity": "Asian (Chinese)"
+    },
+    "physical_description": {
+      "face": {
+        "shape": "round face with soft jawline",
+        "features": "friendly warm smile with slight dimples",
+        "skin": "light tan complexion",
+        "expression": "approachable and energetic"
+      },
+      "hair": {
+        "color": "black",
+        "style": "short with side part",
+        "texture": "slightly messy 'gamer bedhead' natural texture",
+        "length": "2-3 inches on top, shorter on sides"
+      },
+      "eyes": {
+        "color": "dark brown",
+        "shape": "wide and expressive",
+        "details": "slight bags underneath from late-night gaming sessions"
+      },
+      "build": {
+        "type": "slim",
+        "height": "average (5'8\")",
+        "posture": "slightly slouched (typical gamer posture)"
+      }
+    },
+    "clothing": {
+      "primary_outfit": {
+        "top": "bright red gaming hoodie",
+        "logo": "white 'AG' logo on left chest",
+        "bottom": "black skinny jeans",
+        "shoes": "white sneakers"
+      },
+      "accessories": [
+        "round wire-frame glasses (gold metal frame)",
+        "black gaming headset with blue LED accents (worn around neck)",
+        "smartwatch on left wrist (black band)"
+      ]
+    },
+    "personality_traits": {
+      "primary": "friendly and approachable",
+      "secondary": "passionate about gaming and technology",
+      "quirks": "slightly mischievous smile, excited hand gestures when explaining tech"
+    },
+    "visual_style": {
+      "art_style": "photorealistic digital illustration",
+      "lighting": "flat even studio lighting for consistency",
+      "background": "neutral gray (#CCCCCC)"
+    },
+    "reference_images": {
+      "character_sheet": "alex_chen_character_sheet.png",
+      "front_view": "alex_front.png",
+      "side_view": "alex_side.png",
+      "three_quarter": "alex_3quarter.png",
+      "full_body": "alex_fullbody.png",
+      "storage_uri": "gs://YOUR_BUCKET/characters/alex_chen/"
+    },
+    "consistency_keywords": [
+      "Alex",
+      "young Asian male",
+      "round glasses",
+      "red gaming hoodie",
+      "short black hair",
+      "friendly expression"
+    ],
+    "usage_notes": {
+      "always_mention": [
+        "Character name (Alex)",
+        "Round glasses",
+        "Red gaming hoodie"
+      ],
+      "reinforcement_phrases": [
+        "same character Alex",
+        "Alex in his signature red hoodie and glasses",
+        "recognizable Alex with round glasses"
+      ],
+      "art_style_consistency": "Always use 'photorealistic cinematic style' in visual prompts"
+    }
+  },
+  "prompt_templates": {
+    "character_sheet_generation": "Character Sheet of Alex Chen, 22 year old male Asian (Chinese), multiple angles: front view, side profile (left), side profile (right), three-quarter view, full body standing pose. Character details: round face with soft jawline, warm friendly smile, short black hair with side part slightly messy, dark brown wide expressive eyes behind round wire-frame gold glasses, bright red gaming hoodie with white AG logo on chest, black skinny jeans, white sneakers, black gaming headset with blue LED around neck. Slim build, average height, slightly slouched posture. Friendly approachable demeanor with slightly mischievous smile. Art style: photorealistic digital illustration. Lighting: flat even studio lighting. Background: neutral gray. Quality: high detail, 4K, professional character design reference sheet.",
+
+    "scene_prompt_example": "Alex, young Asian male with round glasses and red gaming hoodie, [ACTION], [CAMERA_ANGLE], [LIGHTING], [MOOD], photorealistic cinematic style",
+
+    "action_variations": [
+      "frantically typing on mechanical keyboard with intense focus",
+      "jumping up from chair with arms raised in victory",
+      "staring at screen with shocked expression and jaw dropped",
+      "leaning back in chair explaining something with animated hand gestures",
+      "high-fiving a teammate with excited smile"
+    ]
+  }
+}

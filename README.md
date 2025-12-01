@@ -1,11 +1,34 @@
-# 🎬 Project Blueprint V2: YouTube Shorts Automasi (Google Ecosystem Edition)
+# 🎬 Project Blueprint V2: YouTube Shorts Automasi
 
-**Update Desember 2025: Menggunakan Google Veo 3.1 dan Gemini 2.5 Flash Image untuk alur kerja yang lebih ringkas dan hemat biaya.**
+**Update Desember 2025: Menggunakan Veo 3 dan Gemini 2.5 Flash Image ("Nano Banana") untuk alur kerja yang lebih ringkas dan hemat biaya.**
+
+## 🚀 Two Ways to Get Started
+
+### Option 1: CometAPI (RECOMMENDED ⭐)
+**Setup Time: 5 minutes | Single API Key | Simple Billing**
+
+✅ Easiest setup - just one API key
+✅ Access to Gemini 1.5 Pro, Gemini 2.5 Flash Image, Veo 3
+✅ Pay-as-you-go dengan credit system
+✅ No complex Google Cloud setup needed
+
+**[→ Start with CometAPI](docs/COMETAPI-SETUP.md)**
+
+### Option 2: Google Cloud Direct
+**Setup Time: 30+ minutes | Multiple Credentials | Complex Billing**
+
+For advanced users who need:
+- Large scale (1000+ videos/month)
+- Custom quotas
+- Full infrastructure control
+
+**[→ Google Cloud Setup](docs/GOOGLE-CLOUD-SETUP.md)**
 
 ---
 
 ## 📋 Daftar Isi
 
+- [Two Ways to Get Started](#-two-ways-to-get-started) ⭐ **Start Here**
 - [Perubahan Strategi Utama](#1-perubahan-strategi-utama)
 - [Arsitektur Workflow Baru](#2-arsitektur-workflow-baru-n8n-flow)
 - [Perbandingan Alat](#3-perbandingan-alat-tech-stack-update)
@@ -267,36 +290,44 @@ Hasil dari Node 1 (The Director) akan seperti ini:
 ## 🚀 Quick Start
 
 ### Prerequisites
-1. **Google Cloud Account** dengan billing enabled
+1. **CometAPI Account** (recommended) atau Google Cloud Account
 2. **n8n Instance** (Cloud atau self-hosted)
-3. **API Access** untuk:
-   - Vertex AI (Veo 3.1)
-   - Gemini API (Flash Image & Pro)
-   - Cloud Text-to-Speech (optional)
+3. **API Key** dari CometAPI atau Google Cloud credentials
 
-### Setup Steps
+### Setup Steps (CometAPI - Recommended)
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/cupitebet/n8nVideoPendek.git
 cd n8nVideoPendek
 
-# 2. Install n8n (via Docker)
-docker run -d --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
+# 2. Get CometAPI Key
+# Sign up at: https://www.cometapi.com
+# Get API key from dashboard
 
-# 3. Access n8n
+# 3. Setup environment
+cp config/environment-variables-cometapi.env.example .env
+# Edit .env dan isi COMETAPI_KEY
+
+# 4. Install n8n (via Docker)
+docker run -d --name n8n -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  --env-file .env \
+  n8nio/n8n
+
+# 5. Access n8n
 # URL: http://localhost:5678
 
-# 4. Import workflow
-# Upload file: workflows/youtube-shorts-veo-v2.json
+# 6. Import workflow
+# Upload file: workflows/youtube-shorts-cometapi.json
 
-# 5. Setup Google Cloud credentials
-# - Create service account
-# - Download JSON key
-# - Add to n8n credentials
-
-# 6. Test run!
+# 7. Test run!
+# Just click Execute - API key loaded from .env
 ```
+
+**[→ Detailed CometAPI Setup Guide](docs/COMETAPI-SETUP.md)**
+
+**[→ Google Cloud Setup (Advanced)](docs/GOOGLE-CLOUD-SETUP.md)**
 
 ### Test Your First Video
 

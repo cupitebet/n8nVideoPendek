@@ -1,0 +1,57 @@
+Character Sheet of [CHARACTER_NAME], [AGE] year old [GENDER] [ETHNICITY], multiple angles:
+- Front view facing camera
+- Side profile (left)
+- Side profile (right)
+- Three-quarter view
+- Full body standing pose
+
+Character details:
+- Age: [AGE], Gender: [GENDER], Ethnicity: [ETHNICITY]
+- Distinct facial features: [round face / sharp jawline / high cheekbones / etc]
+- Hair: [color, style, length - be VERY specific]
+- Eyes: [color, shape, size]
+- Clothing: [specific outfit with brand details, colors, logos]
+- Accessories: [glasses style, jewelry, gadgets, etc]
+- Build: [slim / athletic / stocky / etc]
+- Height indicator: [tall / average / short]
+
+Personality hints (shows in expression):
+- [friendly / serious / mysterious / energetic / etc]
+
+Art style: [photorealistic / anime / 3D render / digital illustration / cartoon]
+Lighting: Flat, even studio lighting
+Background: Neutral gray background (#CCCCCC)
+Quality: High detail, 4K, professional character design reference
+Format: Character turnaround sheet
+
+---
+
+EXAMPLE USAGE:
+
+Character Sheet of Alex Chen, 22 year old male Asian (Chinese), multiple angles:
+- Front view facing camera
+- Side profile (left)
+- Side profile (right)
+- Three-quarter view
+- Full body standing pose
+
+Character details:
+- Age: 22, Gender: Male, Ethnicity: Asian (Chinese)
+- Distinct facial features: round face, soft jawline, warm friendly smile, slight dimples
+- Hair: short black hair with side part, slightly messy "gamer bedhead" style, natural texture
+- Eyes: dark brown, wide and expressive, slight bags underneath from late-night gaming
+- Clothing: bright red gaming hoodie with white "AG" logo on left chest, black skinny jeans, white sneakers
+- Accessories: round wire-frame glasses (gold metal), black gaming headset with blue LED accents around neck, smartwatch on left wrist
+- Build: slim, slightly slouched posture (gamer posture)
+- Height indicator: average height (5'8")
+
+Personality hints (shows in expression):
+- Friendly and approachable demeanor
+- Slightly mischievous smile
+- Excited, passionate about gaming
+
+Art style: photorealistic digital illustration
+Lighting: Flat, even studio lighting
+Background: Neutral gray background (#CCCCCC)
+Quality: High detail, 4K, professional character design reference
+Format: Character turnaround sheet

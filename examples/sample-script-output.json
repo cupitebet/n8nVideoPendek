@@ -1,0 +1,67 @@
+{
+  "title": "AI Hacks Gaming! Can Humans Compete?",
+  "total_duration": 60,
+  "scenes": [
+    {
+      "scene_number": 1,
+      "duration_seconds": 3,
+      "voiceover_script": "AI just beat the world champion in under 10 seconds!",
+      "visual_prompt": "Close-up of computer screen showing \"VICTORY\" text in bold red letters with dramatic explosion effect, gaming championship HUD visible with AI player name, intense red and orange lighting reflecting on shocked human face in background, photorealistic cinematic style",
+      "sound_effect_prompt": "Loud victory fanfare, crowd gasping in shock, dramatic cymbal crash"
+    },
+    {
+      "scene_number": 2,
+      "duration_seconds": 12,
+      "voiceover_script": "Meet Alex, a pro gamer who's been training for years. But now, he faces an opponent unlike any other - an AI that learns from every move.",
+      "visual_prompt": "Alex, young Asian male with round glasses and red gaming hoodie, sitting at gaming setup with multiple monitors, hands on mechanical keyboard, determined focused expression, medium shot from side angle, blue screen glow with RGB keyboard lighting, intense competitive mood, photorealistic cinematic style",
+      "sound_effect_prompt": "Mechanical keyboard typing, computer fans humming, intense background music building"
+    },
+    {
+      "scene_number": 3,
+      "duration_seconds": 15,
+      "voiceover_script": "The AI analyzes millions of plays per second. It predicts every strategy, counters every move. Alex's health bar drops rapidly - he's losing!",
+      "visual_prompt": "Same character Alex in red hoodie and glasses, frantically moving mouse with intense concentration, sweat drops on forehead visible, close-up on face showing stress and determination behind glasses with screen reflection showing low health bar, harsh blue monitor light creating dramatic shadows on face, chaotic and tense mood, photorealistic cinematic style",
+      "sound_effect_prompt": "Rapid mouse clicking, heavy breathing, warning beeps getting faster, intense suspenseful music"
+    },
+    {
+      "scene_number": 4,
+      "duration_seconds": 20,
+      "voiceover_script": "But Alex remembers something AI can't replicate - creativity. He pulls off an unexpected combo, something the AI has never seen before. The crowd goes wild!",
+      "visual_prompt": "Alex in signature red gaming hoodie and round glasses, leaning back in chair with both fists clenched in triumph, huge smile on face, gaming monitors showing spectacular combo explosion effects in background, medium shot from low angle making him look heroic, dramatic golden spotlight with blue screen glow, triumphant and energetic mood, photorealistic cinematic style",
+      "sound_effect_prompt": "Massive explosion sound effect, crowd roaring and cheering loudly, epic victory music crescendo, keyboard slam"
+    },
+    {
+      "scene_number": 5,
+      "duration_seconds": 10,
+      "voiceover_script": "AI is powerful, but human creativity still wins. The future of gaming? It's not humans versus AI - it's humans AND AI, together. What do you think?",
+      "visual_prompt": "Alex, young Asian male with round glasses and red hoodie, standing confidently next to holographic AI assistant projection showing a friendly robot face, both looking at camera with welcoming expressions, wide shot in modern gaming arena with RGB lights, warm balanced lighting mixing natural light and screen glow, inspirational hopeful mood, photorealistic cinematic style",
+      "sound_effect_prompt": "Calm inspirational music, gentle crowd applause fading, holographic hum sound effect"
+    }
+  ],
+  "metadata": {
+    "topic": "AI in Gaming",
+    "target_audience": "Gamers, Tech enthusiasts, Gen Z",
+    "tone": "Exciting, Inspirational, Thought-provoking",
+    "cta": "Comment your thoughts on AI in gaming",
+    "suggested_hashtags": [
+      "#AIGaming",
+      "#FutureOfGaming",
+      "#ProGamer",
+      "#TechShorts",
+      "#GamingAI"
+    ]
+  },
+  "character_info": {
+    "main_character": {
+      "name": "Alex",
+      "description": "young Asian male with round glasses and red gaming hoodie",
+      "reference_image_needed": true,
+      "consistent_features": [
+        "round wire-frame glasses",
+        "red gaming hoodie with AG logo",
+        "short black hair",
+        "friendly determined expression"
+      ]
+    }
+  }
+}
