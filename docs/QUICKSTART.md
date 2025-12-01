@@ -1,215 +1,217 @@
-# Quick Start Guide - 10 Menit Setup
+# ⚡ Quick Start - Blueprint V2
 
-Panduan singkat untuk mulai menggunakan workflow dalam 10 menit.
-
-## 🚀 Setup Cepat (Minimum Viable Product)
-
-Untuk mulai dengan cepat, Anda hanya butuh **2 API keys**:
-1. ✅ OpenAI API Key
-2. ✅ NewsAPI Key
-
-Yang lain (WordPress, Telegram, Google Sheets) bisa ditambahkan nanti.
+**Target: Dari nol ke video pertama dalam 30 menit**
 
 ---
 
-## Step 1: Install n8n (2 menit)
+## Prerequisites
 
-### Cara Tercepat - Docker:
+Sebelum mulai, pastikan Anda punya:
+
+1. ✅ **Google Cloud Account** dengan billing enabled
+2. ✅ **n8n** (Cloud atau self-hosted)
+3. ✅ Akses ke:
+   - Vertex AI API
+   - Gemini API
+   - Cloud Text-to-Speech API (optional)
+
+---
+
+## Step 1: Setup Google Cloud (15 menit)
+
+### 1.1 Enable APIs
+
 ```bash
-docker run -d --restart unless-stopped --name n8n \
+# Login ke Google Cloud Console
+# https://console.cloud.google.com
+
+# Enable APIs yang dibutuhkan:
+# - Vertex AI API
+# - Generative Language API (Gemini)
+# - Cloud Text-to-Speech API
+```
+
+Di Console:
+1. Pergi ke **APIs & Services** > **Enable APIs**
+2. Search dan enable:
+   - ✅ Vertex AI API
+   - ✅ Generative Language API
+   - ✅ Cloud Text-to-Speech API
+
+### 1.2 Create Service Account
+
+```bash
+# Di Google Cloud Console:
+# IAM & Admin > Service Accounts > Create Service Account
+
+# Berikan permissions:
+# - Vertex AI User
+# - Cloud Storage Admin (untuk menyimpan video)
+# - Service Account Token Creator
+```
+
+### 1.3 Download JSON Key
+
+1. Klik service account yang baru dibuat
+2. **Keys** tab > **Add Key** > **Create New Key**
+3. Pilih **JSON**
+4. Download file (simpan dengan aman!)
+
+---
+
+## Step 2: Setup n8n (5 menit)
+
+### 2.1 Install n8n
+
+**Via Docker (Recommended):**
+```bash
+docker run -d --name n8n \
   -p 5678:5678 \
   -v ~/.n8n:/home/node/.n8n \
   n8nio/n8n
 ```
 
-Akses: http://localhost:5678
-
----
-
-## Step 2: Dapatkan API Keys (3 menit)
-
-### OpenAI:
-1. Buka https://platform.openai.com/api-keys
-2. Create new secret key
-3. Copy dan simpan
-
-### NewsAPI:
-1. Buka https://newsapi.org/register
-2. Daftar dengan email
-3. Dapatkan API key (langsung muncul)
-
----
-
-## Step 3: Setup Credentials di n8n (2 menit)
-
-1. Di n8n: **Credentials** > **Add Credential**
-
-2. **OpenAI:**
-   - Type: "OpenAI API"
-   - Paste API key
-   - Save
-
-3. **NewsAPI:**
-   - Type: "HTTP Query Auth"
-   - Name: `apiKey`
-   - Value: `YOUR_NEWSAPI_KEY`
-   - Save
-
----
-
-## Step 4: Import Workflow (1 menit)
-
-1. Download: `workflows/tuyul-digital-web3.json`
-2. Di n8n: **Workflows** > **Import from File**
-3. Upload file JSON
-4. Workflow imported!
-
----
-
-## Step 5: Test Run (2 menit)
-
-### Quick Test (tanpa Telegram/WordPress):
-
-1. **Disable nodes yang belum di-setup:**
-   - Upload Image to WordPress
-   - Publish Article to WordPress
-   - Publish to Telegram
-   - Archive to Google Sheets
-   - Send Admin Notification
-
-2. **Add Manual Trigger:**
-   - Drag "Manual Trigger" node
-   - Connect ke "Fetch Crypto News"
-   - Disable "Schedule Trigger"
-
-3. **Run Test:**
-   - Click "Execute Workflow"
-   - Lihat hasil di node "Parse Generated Content"
-
-4. **Cek Output:**
-   - Buka node "Parse Generated Content"
-   - Lihat `generated_content` → artikel, video script, caption
-
----
-
-## ✅ Selesai! Workflow Dasar Jalan
-
-**Apa yang sudah bisa dilakukan:**
-- ✅ Fetch berita crypto terbaru
-- ✅ Filter berita relevan (presale, web3, dll)
-- ✅ Research otomatis dengan AI
-- ✅ Generate artikel + script video + caption
-
-**Apa yang belum:**
-- ⏸️ Auto-publish ke WordPress
-- ⏸️ Kirim ke Telegram
-- ⏸️ Archive ke Google Sheets
-- ⏸️ Generate gambar
-
----
-
-## 🎯 Next Steps (Setup Lengkap)
-
-### Level 2: Tambah Telegram (5 menit)
-1. Chat @BotFather di Telegram
-2. `/newbot` → ikuti instruksi
-3. Dapatkan bot token
-4. Setup credential di n8n
-5. Enable node "Publish to Telegram"
-
-### Level 3: Tambah WordPress (10 menit)
-1. Install WordPress (atau pakai existing)
-2. Generate Application Password
-3. Setup credential di n8n
-4. Update WordPress URL di nodes
-5. Enable publishing nodes
-
-### Level 4: Tambah Google Sheets (10 menit)
-1. Create Google Cloud project
-2. Enable Sheets API
-3. Create OAuth credentials
-4. Setup di n8n
-5. Enable archive node
-
-### Level 5: Tambah Image Generation (5 menit)
-1. Daftar HuggingFace
-2. Generate token
-3. Setup credential
-4. Enable image generation node
-
-### Level 6: Production (Auto-Pilot)
-1. Verify semua nodes aktif
-2. Set schedule (default: 8AM daily)
-3. Activate workflow
-4. Monitor executions
-
----
-
-## 💡 Tips Optimasi
-
-### Hemat Cost OpenAI:
-```json
-{
-  "max_items_per_run": 1,  // Mulai dari 1 artikel/hari
-  "model": "gpt-4o-mini"   // Model paling murah
-}
+**Via npm:**
+```bash
+npm install n8n -g
+n8n start
 ```
 
-### Improve Content Quality:
-1. Edit prompt di `prompts/content-generation-prompt.txt`
-2. Tambah contoh style yang Anda mau
-3. Test dengan manual trigger
-4. Iterate sampai puas
+### 2.2 Access n8n
 
-### Filter Lebih Baik:
-Edit keywords di `config/settings.json`:
+Buka browser: `http://localhost:5678`
+
+---
+
+## Step 3: Import Workflow (5 menit)
+
+### 3.1 Download Workflow
+
+File workflow ada di: `workflows/youtube-shorts-veo-v2.json`
+
+### 3.2 Import ke n8n
+
+1. Di n8n, klik **Workflows** menu
+2. Klik **Import from File**
+3. Upload `youtube-shorts-veo-v2.json`
+4. Workflow akan terbuka otomatis
+
+### 3.3 Setup Credentials
+
+**Google Cloud Credential:**
+1. Klik node "Gemini 1.5 Pro" atau "Veo 3.1"
+2. Di credential dropdown, pilih **Create New**
+3. Pilih **Google Service Account**
+4. Upload JSON key yang sudah didownload di Step 1.3
+
+**Ulangi untuk semua node Google:**
+- ✅ Gemini 1.5 Pro (The Director)
+- ✅ Gemini 2.5 Flash Image (Image Generator)
+- ✅ Veo 3.1 (Video Generator)
+- ✅ Cloud TTS (Text-to-Speech) - optional
+
+---
+
+## Step 4: Test Run (5 menit)
+
+### 4.1 Set Input Topic
+
+1. Cari node **"Manual Trigger"** di awal workflow
+2. Klik node tersebut
+3. Di bagian **Parameters**, isi:
+   - **topic**: `"AI Revolution in Gaming"`
+
+### 4.2 Execute Workflow
+
+1. Klik tombol **Execute Workflow** (pojok kanan bawah)
+2. Tunggu proses berjalan (3-5 menit)
+3. Lihat output di setiap node
+
+### 4.3 Check Results
+
+Hasil yang diharapkan:
+
+**Node 1 (The Director):**
 ```json
 {
-  "filter_keywords": [
-    "presale",
-    "IDO",
-    "your custom keywords"
+  "title": "AI Mengubah Gaming Selamanya!",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "duration_seconds": 3,
+      "voiceover_script": "...",
+      "visual_prompt": "...",
+      "sound_effect_prompt": "..."
+    }
   ]
 }
 ```
 
----
+**Node 2 (Gemini Flash Image):**
+- ✅ Character reference images generated
+- ✅ Scene images created
 
-## 🐛 Troubleshooting Cepat
+**Node 3 (Veo 3.1):**
+- ✅ Video clips generated (with audio!)
+- ✅ URLs to download videos
 
-**Error: "Missing credentials"**
-→ Setup credential untuk node tersebut atau disable node
-
-**Error: "Rate limit"**
-→ NewsAPI free: max 100/day. Kurangi frequency.
-
-**Konten tidak bagus:**
-→ Edit prompt di folder `prompts/`
-
-**Berita tidak relevan:**
-→ Adjust keywords di filter node
+**Node 5 (Final Assembly):**
+- ✅ Complete 60-second video
+- ✅ With subtitles and background music
 
 ---
 
-## 📊 Monitoring
+## Troubleshooting
 
-### Cek Executions:
-- n8n > Executions
-- Lihat success/failed runs
-- Debug error dari log
+### Error: "API not enabled"
+- ✅ Pastikan semua APIs sudah di-enable di Google Cloud Console
+- ✅ Tunggu 1-2 menit setelah enable
 
-### Cek API Usage:
-- OpenAI: https://platform.openai.com/usage
-- NewsAPI: https://newsapi.org/account
+### Error: "Quota exceeded"
+- ✅ Check quota limits di Google Cloud Console
+- ✅ Request quota increase jika perlu
+
+### Error: "Permission denied"
+- ✅ Pastikan Service Account punya permissions yang benar
+- ✅ Re-create credential di n8n dengan JSON key yang baru
+
+### Video tidak generate
+- ✅ Check output Node 1 - pastikan JSON valid
+- ✅ Check Node 2 - pastikan images ter-generate
+- ✅ Check Veo 3.1 node configuration
 
 ---
 
-## 🎉 Congratulations!
+## Next Steps
 
-Workflow Anda sudah jalan! Mulai dari sini, Anda bisa:
-1. Monitor konten yang di-generate
-2. Tweak prompt untuk hasil lebih baik
-3. Add platform baru (TikTok, YouTube)
-4. Scale up (lebih banyak artikel/hari)
+Setelah berhasil test run pertama:
 
-**Happy Automating! 🚀**
+1. 📖 **Customize Prompts** - Lihat [Prompt Guide](PROMPT-GUIDE.md)
+2. 🎨 **Character Consistency** - Lihat [Character Guide](CHARACTER-CONSISTENCY.md)
+3. ⚙️ **Optimize Settings** - Lihat [Configuration Guide](CONFIGURATION.md)
+4. 🚀 **Production Setup** - Lihat [Production Guide](PRODUCTION-SETUP.md)
+
+---
+
+## Cost Estimate untuk Test Run
+
+- Gemini 1.5 Pro (1 request): ~$0.001
+- Gemini 2.5 Flash Image (5 images): ~$0.0025
+- Veo 3.1 (5 video clips): ~$0.50
+- Cloud TTS (500 chars): ~$0.008
+- **Total per test**: ~$0.51
+
+**Sangat murah untuk test!** 🎉
+
+---
+
+## Support
+
+Butuh bantuan?
+- 📖 [Full Documentation](README.md)
+- 🐛 [Troubleshooting Guide](TROUBLESHOOTING.md)
+- 💬 [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
+
+---
+
+**Selamat! Video pertama Anda siap! 🎬**

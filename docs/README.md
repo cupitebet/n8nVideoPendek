@@ -1,141 +1,291 @@
-# README: Workflow "Tuyul Digital Web3" untuk Crypto/Blockchain/Presale
+# 📚 Documentation - Blueprint V2
 
-**Versi:** 1.0
-**Tanggal:** 2025-11-20
-**Penulis:** Cupi
+**Complete guide untuk YouTube Shorts Automation menggunakan Google Veo 3.1**
 
-## 1. Tujuan
+---
 
-Membangun sistem otomatisasi yang:
+## 🚀 Getting Started
 
-* Secara periodik (terjadwal) mencari tren berita/presale di niche crypto, blockchain, Web3.
-* Menganalisa data tersebut dengan AI.
-* Membuat konten video pendek (TikTok, Reels, YouTube Shorts) + artikel Web yang siap publish.
-* Mengurangi intervensi manual sebanyak mungkin.
-* Memanfaatkan n8n sebagai engine automasi.
+**New to Blueprint V2? Start here:**
 
-## 2. Scope
+1. **[Quick Start Guide](QUICKSTART.md)** ⚡
+   - Dari nol ke video pertama dalam 30 menit
+   - Prerequisites dan setup checklist
+   - First test run walkthrough
 
-**Masuk dalam scope**
+2. **[Google Cloud Setup](GOOGLE-CLOUD-SETUP.md)** ☁️
+   - Enable APIs (Veo 3.1, Gemini, Cloud TTS)
+   - Create service account
+   - Setup billing dan quotas
+   - Security best practices
 
-* Trigger terjadwal (cron) untuk fetch berita crypto/presale.
-* Riset otomatis: narasi, tokenomics, ekosistem.
-* Generasi konten: artikel panjang, short post, caption media sosial.
-* Generasi media bantu: gambar futuristik (untuk thumbnail/video) atau klip pendek video.
-* Publishing otomatis: ke WordPress (artikel) + Telegram/YouTube/TikTok (short).
-* Penyimpanan data riset ke Google Sheets atau database ringan sebagai archive.
+---
 
-**Keluar dari scope**
+## 🎓 Core Concepts
 
-* Pembuatan sistem monetisasi langsung (payment, wallet integrasi) kecuali sudah disepakati.
-* Analisis on-chain yang memerlukan full node atau heavy data (kecuali disepakati tambahan).
-* Integrasi kompleks dengan sistem eksternal yang belum tersedia.
+### Character Consistency
 
-## 3. Arsitektur Workflow
+**[Character Consistency Guide](CHARACTER-CONSISTENCY.md)** 👤
 
-1. **Trigger Schedule Node** – misalnya cron tiap hari pukul 08:00 WIB.
-2. **Fetch News/Trending Topics Node** – API HTTP request untuk berita crypto/presale.
-3. **Filter Node** – menyaring berita yang relevan (kata kunci: "presale", "web3", "blockchain", "AI", "L2", "ecosystem").
-4. **Research Node** – menggunakan AI (GPT) untuk analisis: project name, narrative, tokenomics, risiko.
-5. **Content Generation Node** – AI menghasilkan artikel panjang, post singkat, caption.
-6. **Media Generation Node** – gambar (Flux AI) atau video clip (opsional) untuk konten short.
-7. **Publishing Node**
-   * Upload gambar/media ke WordPress → posting artikel.
-   * Push short post ke Telegram/YouTube/TikTok (via API atau integrasi).
-8. **Archive/Database Node** – simpan hasil riset ke Google Sheets / database.
-9. **Notification Node** – kirim pemberitahuan ke admin setelah publish.
+The #1 problem dengan AI video: karakter berubah-ubah.
 
-## 4. Detail Node dan Konfigurasi
+**Learn:**
+- How to create character sheets dengan Gemini Flash
+- Using reference images dengan Veo 3.1
+- Prompt engineering untuk consistency
+- Testing dan troubleshooting
 
-| Node                   | Tipe                   | Penjelasan / Parameter penting                                                        |
-| ---------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
-| Scheduled Trend Fetch  | Trigger (Cron)         | Eksekusi otomatis; contoh: `0 8 * * *` (setiap hari pk 08:00 WIB)                     |
-| Fetch Crypto News      | HTTP Request           | URL API; set method GET; output JSON.                                                 |
-| Filter Presale Web3    | Function / If Node     | Hanya keluarkan berita yang mengandung kata kunci relevan.                            |
-| Research Presale Web3  | OpenAI Node            | Model: GPT-4o-mini (atau yang sesuai); prompt analisis proyek crypto.                 |
-| Generate Content       | OpenAI Node            | Prompt untuk artikel, short post, caption untuk video pendek.                         |
-| Generate Image         | HTTP Request (Flux AI) | Prompt gambar futuristik untuk proyek.                                                |
-| Upload to WordPress    | HTTP Request           | URL endpoint WP REST API; credentials WP; posting tipe "post" atau CPT "crypto-news". |
-| Telegram/Short Publish | API Node               | Integrasi Telegram Bot / YouTube / TikTok (di-integrasikan developer).                |
-| Archive to Sheet       | Google Sheets Node     | Simpan field seperti: project_name, date, verdict, risk, url.                         |
-| Notification           | Telegram / Slack Node  | Kirim pesan "Konten untuk project X telah publish".                                   |
+**Essential reading untuk professional-looking videos!**
 
-## 5. Kredensial & Integrasi
+---
 
-Developer harus menyiapkan:
+## 🎨 Content Creation
 
-* API Key untuk OpenAI.
-* API Key untuk Flux AI (atau penyedia gambar/video).
-* API Key untuk berita crypto (news API) atau scraping.
-* WordPress: token atau user/password dengan hak REST API.
-* Google Sheets: Client ID & Client Secret untuk OAuth.
-* Telegram Bot atau integrasi YouTube/TikTok sesuai kebutuhan.
+### Prompts & Templates
 
-## 6. Alur Data & Format Output
+**Location:** `../prompts/`
 
-* Input dari berita → JSON format array berita.
-* Setelah filter → output JSON satu atau beberapa item berita terpilih.
-* Research Node output JSON terstruktur seperti:
+**Files:**
+- `director-system-prompt.txt` - The Director system prompt
+- `character-sheet-template.txt` - Template untuk character creation
+- `visual-prompt-template.txt` - Structure untuk visual prompts
 
-  ```json
-  {
-    "project_name": "...",
-    "category": "...",
-    "value_prop": "...",
-    "use_case": "...",
-    "tokenomics": {
-      "ticker": "...",
-      "chain": "...",
-      "supply": "...",
-      "presale_price": "...",
-      "vesting": "..."
-    },
-    "roadmap": "...",
-    "risk_flags": [...],
-    "verdict": "..."
-  }
-  ```
-* Generate Content Node: output JSON dengan artikel, short post, caption.
-* Media Node: output URL atau media_id upload.
-* WordPress Node: gunakan properti media_id dan konten.
-* Archive Node: simpan minimal: date, project_name, verdict, publish_url.
+**Key concepts:**
+- Conflict Arc storytelling structure
+- Visual prompt anatomy
+- Sound effect descriptions
+- Consistency keywords
 
-## 7. Best Practices & Error Handling
+---
 
-* Gunakan If / Switch nodes untuk validasi input (pastikan JSON berisi field yang diharapkan).
-* Tambahkan retry logic pada HTTP Request yang bisa gagal.
-* Catat error ke log atau Google Sheets agar bisa di-review.
-* Kredensial jangan hard-code di node, gunakan n8n Credentials.
-* Uji workflow secara manual terlebih dahulu dengan sample data sebelum aktifkan scheduled.
-* Pantau eksekusi dan resource (karena penggunaan AI dan gambar/video bisa berat).
+## ⚙️ Configuration
 
-## 8. Deployment & Aktivasi
+### Config Files
 
-* Pastikan n8n telah di-host (self-host atau cloud).
-* Import JSON workflow (pastikan format valid JSON).
-* Aktifkan workflow ("Active").
-* Monitor hasil eksekusi (menu Executions) dan cek output apakah sesuai.
-* Lakukan penyesuaian parameter (cron schedule, kata kunci filter, prompt AI) bila diperlukan.
+**Location:** `../config/`
 
-## 9. Checklist untuk Developer
+**Files:**
+- `veo-settings.json` - Veo 3.1 API configuration
+- `google-credentials-setup.md` - Credentials setup guide
 
-* [ ] Setup credentials: OpenAI, Flux AI, News API, WordPress, Google Sheets.
-* [ ] Buat trigger cron node.
-* [ ] Buat node fetch berita dan test dengan 1 pickup.
-* [ ] Buat filter node dan verifikasi filter bekerja.
-* [ ] Buat research node; test dengan sample berita.
-* [ ] Buat content generation node + test output.
-* [ ] Buat media generation node + test gambar/video.
-* [ ] Buat upload ke WordPress node + test posting.
-* [ ] Buat publish short post node (Telegram/YouTube/TikTok) + test.
-* [ ] Buat archive node + test logging.
-* [ ] Buat notification node.
-* [ ] Aktifkan workflow dalam mode otomatis dan monitor eksekusi pertama swalayan.
-* [ ] Siapkan dokumentasi kecil bagaimana user (Cupi) bisa mengganti prompt, kata kunci, schedule.
+**What you can configure:**
+- Video length (5s, 8s, 10s)
+- Aspect ratio (9:16, 1:1, 16:9)
+- Quality settings
+- Temperature untuk AI models
+- Cost limits dan alerts
 
-## 10. Pemeliharaan & Pengembangan
+---
 
-* Evaluasi performa (berapa konten yang terpublish, view, engagement).
-* Update kata kunci filter secara berkala (tren berubah cepat di crypto).
-* Update prompt AI agar tetap relevan (2025 → 2026 narrative bisa berbeda).
-* Tambah integrasi baru apabila perlu: e.g., TikTok API, YouTube Shorts upload, analytics tracking.
+## 🔧 Workflows
+
+### n8n Workflows
+
+**Location:** `../workflows/`
+
+**Available workflows:**
+- `youtube-shorts-veo-v2.json` - Full automation (🚧 Coming Soon)
+- `youtube-shorts-manual.json` - Semi-manual for learning (🚧 Coming Soon)
+- `character-generator.json` - Standalone character creator (🚧 Coming Soon)
+
+**See:** [Workflows README](../workflows/README.md)
+
+---
+
+## 📖 Guides by Topic
+
+### Setup & Installation
+- ✅ [Quick Start](QUICKSTART.md) - 30 minute setup
+- ✅ [Google Cloud Setup](GOOGLE-CLOUD-SETUP.md) - Detailed GCP guide
+
+### Content Creation
+- ✅ [Character Consistency](CHARACTER-CONSISTENCY.md) - Master character consistency
+- 🚧 Prompt Engineering Guide (Coming Soon)
+- 🚧 Script Writing Guide (Coming Soon)
+
+### Technical
+- ✅ [Config Files](../config/) - Configuration reference
+- 🚧 API Reference (Coming Soon)
+- 🚧 Troubleshooting Guide (Coming Soon)
+
+### Advanced
+- 🚧 Multi-Character Videos (Coming Soon)
+- 🚧 Custom Styles & Themes (Coming Soon)
+- 🚧 Batch Processing (Coming Soon)
+- 🚧 Analytics & Optimization (Coming Soon)
+
+---
+
+## 💡 Examples
+
+### Sample Outputs
+
+**Location:** `../examples/`
+
+**Files:**
+- `sample-script-output.json` - Example script dari The Director
+- `sample-character-sheet.json` - Example character definition
+- 🚧 `sample-veo-request.json` (Coming Soon)
+- 🚧 `sample-final-video-metadata.json` (Coming Soon)
+
+**See:** [Examples README](../examples/README.md)
+
+---
+
+## 🗺️ Learning Path
+
+### For Beginners
+
+**Week 1: Foundation**
+1. Day 1-2: Setup Google Cloud
+2. Day 3: Import workflow dan test run pertama
+3. Day 4-5: Understand output structure
+4. Day 6-7: Create first custom character
+
+**Week 2: Customization**
+1. Day 8-10: Master prompt engineering
+2. Day 11-12: Experiment dengan styles
+3. Day 13-14: Create 5 different videos
+
+**Week 3: Optimization**
+1. Day 15-17: Optimize for consistency
+2. Day 18-19: Improve quality settings
+3. Day 20-21: Batch process videos
+
+### For Advanced Users
+
+**Focus areas:**
+- Multi-character storylines
+- Custom art styles
+- Advanced Veo 3.1 parameters
+- Cost optimization strategies
+- Production workflows
+
+---
+
+## 🆘 Getting Help
+
+### Common Issues
+
+**"API not enabled"**
+→ [Google Cloud Setup](GOOGLE-CLOUD-SETUP.md#step-3-enable-required-apis)
+
+**"Quota exceeded"**
+→ [Google Cloud Setup](GOOGLE-CLOUD-SETUP.md#step-6-request-quota-increase)
+
+**"Character not consistent"**
+→ [Character Consistency Guide](CHARACTER-CONSISTENCY.md#common-issues--solutions)
+
+**"Permission denied"**
+→ [Credentials Setup](../config/google-credentials-setup.md#troubleshooting)
+
+### Full Troubleshooting
+🚧 Comprehensive troubleshooting guide (Coming Soon)
+
+### Community Support
+- 💬 [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
+- 📧 Email support
+- 💬 Discord community (Coming Soon)
+
+---
+
+## 📊 Architecture Overview
+
+```
+Input: Topic
+    ↓
+┌─────────────────────────────────────┐
+│  STAGE 1: THE DIRECTOR              │
+│  (Gemini 1.5 Pro)                   │
+│  - Generate script                  │
+│  - Conflict Arc structure           │
+│  - Scene breakdown                  │
+└─────────────┬───────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│  STAGE 2: VISUAL FACTORY            │
+│                                     │
+│  Node A: Character Images           │
+│  (Gemini 2.5 Flash Image)          │
+│  - Create character sheets          │
+│  - Generate scene images            │
+│                                     │
+│  Node B: Video Generation           │
+│  (Veo 3.1)                          │
+│  - Image-to-video conversion        │
+│  - Native audio (SFX + ambience)   │
+│  - 5-10 second clips                │
+└─────────────┬───────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│  STAGE 3: ASSEMBLY                  │
+│                                     │
+│  Node C: Voiceover (Optional)       │
+│  (Cloud Text-to-Speech)             │
+│  - Narrator voice                   │
+│                                     │
+│  Node D: Final Edit                 │
+│  (Creatomate)                       │
+│  - Combine clips                    │
+│  - Add subtitles                    │
+│  - Add background music             │
+└─────────────┬───────────────────────┘
+              ↓
+Output: 60-second YouTube Short (MP4)
+```
+
+---
+
+## 💰 Cost Breakdown
+
+### Per Video (30 videos/month)
+
+| Component | Cost | Monthly |
+|-----------|------|---------|
+| Gemini 1.5 Pro (script) | $0.001 | $0.03 |
+| Gemini Flash (5 images) | $0.0025 | $0.075 |
+| Veo 3.1 (5 clips) | $0.50 | $15.00 |
+| Cloud TTS (500 chars) | $0.008 | $0.24 |
+| Cloud Storage | $0.02 | $0.60 |
+| **Total** | **~$0.51** | **~$16** |
+
+**Way cheaper than subscriptions ($90+/month)!**
+
+---
+
+## 🔗 Quick Links
+
+### Essential Docs
+- [Quick Start](QUICKSTART.md)
+- [Google Cloud Setup](GOOGLE-CLOUD-SETUP.md)
+- [Character Consistency](CHARACTER-CONSISTENCY.md)
+
+### Resources
+- [Main README](../README.md)
+- [Workflows](../workflows/README.md)
+- [Examples](../examples/README.md)
+- [Prompts](../prompts/)
+- [Config](../config/)
+
+### External
+- [Google Veo 3.1 Docs](https://cloud.google.com/vertex-ai/docs/generative-ai/video/overview)
+- [Gemini API Docs](https://ai.google.dev/gemini-api/docs)
+- [n8n Documentation](https://docs.n8n.io/)
+
+---
+
+## 🎯 Next Steps
+
+**Already read the docs?**
+
+1. ✅ [Setup Google Cloud](GOOGLE-CLOUD-SETUP.md)
+2. ✅ [Run Quick Start](QUICKSTART.md)
+3. ✅ [Master Character Consistency](CHARACTER-CONSISTENCY.md)
+4. ✅ Create your first 5 videos
+5. ✅ Share results dan iterate!
+
+---
+
+**Happy Learning! 📚✨**
+
+*Blueprint V2 - Making AI video creation accessible to everyone*

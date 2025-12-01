@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_id": "YOUR_PROJECT_ID",
+    "location": "us-central1",
+    "bucket_name": "YOUR_BUCKET_NAME"
+  },
+  "veo_api": {
+    "endpoint": "https://us-central1-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/us-central1/publishers/google/models/veo-003-1:predict",
+    "model": "veo-003-1",
+    "default_parameters": {
+      "sampleCount": 1,
+      "videoLength": "5s",
+      "aspectRatio": "9:16",
+      "imageControlMode": "character_reference"
+    },
+    "video_lengths": {
+      "short": "5s",
+      "medium": "8s",
+      "long": "10s"
+    },
+    "aspect_ratios": {
+      "vertical": "9:16",
+      "square": "1:1",
+      "horizontal": "16:9"
+    }
+  },
+  "gemini_api": {
+    "models": {
+      "director": "gemini-1.5-pro",
+      "image_gen": "gemini-2.5-flash-image",
+      "text_gen": "gemini-2.0-flash"
+    },
+    "temperature": {
+      "creative": 0.9,
+      "balanced": 0.7,
+      "precise": 0.3
+    }
+  },
+  "workflow_settings": {
+    "scenes_per_video": 5,
+    "target_duration_seconds": 60,
+    "character_consistency": true,
+    "auto_subtitles": true,
+    "background_music": true
+  },
+  "output_settings": {
+    "video_format": "mp4",
+    "video_quality": "1080p",
+    "fps": 30,
+    "audio_bitrate": "128k",
+    "subtitle_format": "srt"
+  },
+  "cost_limits": {
+    "daily_max_videos": 10,
+    "monthly_budget_usd": 100,
+    "alert_threshold_percent": 80
+  }
+}

@@ -79,3 +79,23 @@ sheets-token.json
 
 # Custom
 local-config.json
+
+# Blueprint V2 - Google Cloud
+google-service-account.json
+service-account-*.json
+*.json
+!package.json
+!workflows/*.json
+!examples/*.json
+!config/veo-settings.json
+
+# Blueprint V2 - Generated Assets
+output/
+generated_videos/
+generated_images/
+*.mp4
+*.mov
+*.avi
+!examples/*.mp4
+!examples/*.png
+!examples/*.jpg
