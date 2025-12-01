@@ -1,0 +1,371 @@
+{
+  "name": "YouTube Shorts - Blueprint V2 (CometAPI)",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "topic",
+              "value": "AI in Gaming"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "manual-trigger",
+      "name": "Input: Set Topic",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cometapi.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"gemini-1.5-pro\\\",\\n  \\\"messages\\\": [\\n    {\\n      \\\"role\\\": \\\"system\\\",\\n      \\\"content\\\": `ROLE: Sutradara YouTube Shorts Viral kelas dunia.\\n\\nTUGAS: Buat naskah 60 detik dengan Conflict Arc.\\n\\nSTRUKTUR:\\n1. HOOK (0-3s): Visual mengejutkan\\n2. RISING (3-15s): Perkenalan karakter\\n3. CONFLICT (15-30s): Masalah besar\\n4. COMEBACK (30-50s): Solusi heroik\\n5. PAYOFF (50-60s): Hasil + CTA\\n\\nOUTPUT JSON:\\n{\\n  \\\"title\\\": \\\"...\\\",\\n  \\\"scenes\\\": [\\n    {\\n      \\\"scene_number\\\": 1,\\n      \\\"duration_seconds\\\": 3,\\n      \\\"voiceover_script\\\": \\\"...\\\",\\n      \\\"visual_prompt\\\": \\\"Detail visual untuk AI...\\\",\\n      \\\"sound_effect_prompt\\\": \\\"Sound effects...\\\"\\n    }\\n  ]\\n}`\\n    },\\n    {\\n      \\\"role\\\": \\\"user\\\",\\n      \\\"content\\\": `Topic: ${$json.topic}\\n\\nGenerate 60-second script dengan 5 scenes.`\\n    }\\n  ],\\n  \\\"temperature\\\": 0.7,\\n  \\\"response_format\\\": { \\\"type\\\": \\\"json_object\\\" }\\n} }}"
+      },
+      "id": "director-gemini",
+      "name": "The Director (Gemini 1.5 Pro)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 300],
+      "notes": "Generate script via CometAPI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse response from CometAPI\nconst response = $input.item.json;\nconst contentText = response.choices[0].message.content;\n\n// Parse JSON dari text\nconst script = JSON.parse(contentText);\n\nreturn {\n  json: {\n    title: script.title,\n    scenes: script.scenes,\n    totalScenes: script.scenes.length\n  }\n};"
+      },
+      "id": "parse-script",
+      "name": "Parse Script",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "scenes",
+        "options": {}
+      },
+      "id": "split-scenes",
+      "name": "Split Scenes",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cometapi.com/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"gemini-2.5-flash-image\\\",\\n  \\\"prompt\\\": $json.visual_prompt,\\n  \\\"n\\\": 1,\\n  \\\"size\\\": \\\"1024x1024\\\"\\n} }}"
+      },
+      "id": "generate-images",
+      "name": "Generate Images (Nano Banana)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 300],
+      "notes": "Gemini 2.5 Flash Image via CometAPI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract image URL from CometAPI response\nconst response = $input.item.json;\nconst imageUrl = response.data[0].url;\n\nreturn {\n  json: {\n    scene_number: $input.item.json.scene_number,\n    visual_prompt: $input.item.json.visual_prompt,\n    sound_effect_prompt: $input.item.json.sound_effect_prompt,\n    voiceover_script: $input.item.json.voiceover_script,\n    duration_seconds: $input.item.json.duration_seconds,\n    image_url: imageUrl\n  }\n};"
+      },
+      "id": "extract-image-url",
+      "name": "Extract Image URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cometapi.com/v1/video/veo3/video-create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"veo3\\\",\\n  \\\"prompt\\\": $json.visual_prompt,\\n  \\\"image_url\\\": $json.image_url,\\n  \\\"aspect_ratio\\\": \\\"9:16\\\",\\n  \\\"duration\\\": 5\\n} }}"
+      },
+      "id": "generate-video-veo",
+      "name": "Generate Video (Veo 3)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1450, 300],
+      "notes": "Veo 3 video generation via CometAPI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract task_id from Veo3 response\nconst response = $input.item.json;\nconst taskId = response.task_id || response.id;\n\nreturn {\n  json: {\n    scene_number: $input.item.json.scene_number,\n    task_id: taskId,\n    voiceover_script: $input.item.json.voiceover_script,\n    duration_seconds: $input.item.json.duration_seconds,\n    status: 'processing'\n  }\n};"
+      },
+      "id": "extract-task-id",
+      "name": "Extract Task ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "unit": "seconds",
+        "amount": 30
+      },
+      "id": "wait-for-video",
+      "name": "Wait for Video Processing",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1850, 300],
+      "webhookId": "auto-generated"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://api.cometapi.com/v1/video/veo3/video-status?task_id=' + $json.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
+            }
+          ]
+        }
+      },
+      "id": "check-video-status",
+      "name": "Check Video Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract video URL when ready\nconst response = $input.item.json;\n\nif (response.status === 'completed' && response.video_url) {\n  return {\n    json: {\n      scene_number: $input.item.json.scene_number,\n      video_url: response.video_url,\n      voiceover_script: $input.item.json.voiceover_script,\n      duration_seconds: $input.item.json.duration_seconds,\n      status: 'completed'\n    }\n  };\n} else {\n  throw new Error('Video not ready yet. Status: ' + response.status);\n}"
+      },
+      "id": "extract-video-url",
+      "name": "Extract Video URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "aggregateItems",
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "scenes"
+      },
+      "id": "aggregate-scenes",
+      "name": "Aggregate All Scenes",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [2450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format final output\nconst scenes = $input.item.json.scenes;\n\nreturn {\n  json: {\n    status: 'completed',\n    title: $input.first().json.title,\n    total_scenes: scenes.length,\n    scenes: scenes,\n    video_urls: scenes.map(s => s.video_url),\n    created_at: new Date().toISOString(),\n    next_step: 'Download videos and assemble with video editor (manual or Creatomate)'\n  }\n};"
+      },
+      "id": "format-output",
+      "name": "Format Final Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2650, 300]
+    }
+  ],
+  "connections": {
+    "Input: Set Topic": {
+      "main": [
+        [
+          {
+            "node": "The Director (Gemini 1.5 Pro)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The Director (Gemini 1.5 Pro)": {
+      "main": [
+        [
+          {
+            "node": "Parse Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Script": {
+      "main": [
+        [
+          {
+            "node": "Split Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Scenes": {
+      "main": [
+        [
+          {
+            "node": "Generate Images (Nano Banana)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Images (Nano Banana)": {
+      "main": [
+        [
+          {
+            "node": "Extract Image URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image URL": {
+      "main": [
+        [
+          {
+            "node": "Generate Video (Veo 3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video (Veo 3)": {
+      "main": [
+        [
+          {
+            "node": "Extract Task ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Task ID": {
+      "main": [
+        [
+          {
+            "node": "Wait for Video Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Video Processing": {
+      "main": [
+        [
+          {
+            "node": "Check Video Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Video Status": {
+      "main": [
+        [
+          {
+            "node": "Extract Video URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Video URL": {
+      "main": [
+        [
+          {
+            "node": "Aggregate All Scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate All Scenes": {
+      "main": [
+        [
+          {
+            "node": "Format Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Blueprint V2",
+      "id": "blueprint-v2"
+    },
+    {
+      "name": "CometAPI",
+      "id": "cometapi"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-01T11:30:00.000Z",
+  "versionId": "2"
+}

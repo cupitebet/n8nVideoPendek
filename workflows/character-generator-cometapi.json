@@ -1,0 +1,128 @@
+{
+  "name": "Character Generator - CometAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "character_name",
+              "value": "Alex Chen"
+            },
+            {
+              "name": "character_description",
+              "value": "young Asian male, 22 years old, round glasses, red gaming hoodie, short black hair, friendly expression"
+            }
+          ]
+        }
+      },
+      "id": "input-character",
+      "name": "Input: Character Details",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build character sheet prompt\nconst name = $input.item.json.character_name;\nconst desc = $input.item.json.character_description;\n\nconst prompt = `Character Sheet of ${name}, ${desc}, multiple angles:\n- Front view facing camera\n- Side profile (left)\n- Side profile (right) \n- Three-quarter view\n- Full body standing pose\n\nCharacter details from description: ${desc}\n\nArt style: photorealistic digital illustration\nLighting: Flat, even studio lighting\nBackground: Neutral gray background (#CCCCCC)\nQuality: High detail, 4K, professional character design reference\nFormat: Character turnaround sheet`;\n\nreturn {\n  json: {\n    character_name: name,\n    prompt: prompt,\n    description: desc\n  }\n};"
+      },
+      "id": "build-prompt",
+      "name": "Build Character Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cometapi.com/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"gemini-2.5-flash-image\\\",\\n  \\\"prompt\\\": $json.prompt,\\n  \\\"n\\\": 1,\\n  \\\"size\\\": \\\"1024x1024\\\",\\n  \\\"response_format\\\": \\\"url\\\"\\n} }}"
+      },
+      "id": "generate-character",
+      "name": "Generate Character Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300],
+      "notes": "Gemini 2.5 Flash Image (Nano Banana) via CometAPI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract image URL from response\nconst response = $input.item.json;\nconst imageUrl = response.data[0].url;\n\nconst characterName = $input.item.json.character_name;\nconst filename = characterName.toLowerCase().replace(/\\s+/g, '_') + '_character_sheet.png';\n\nreturn {\n  json: {\n    status: 'completed',\n    character_name: characterName,\n    description: $input.item.json.description,\n    image_url: imageUrl,\n    filename: filename,\n    created_at: new Date().toISOString(),\n    usage_tip: 'Use this image_url in Veo 3 video generation for character consistency'\n  }\n};"
+      },
+      "id": "format-output",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Input: Character Details": {
+      "main": [
+        [
+          {
+            "node": "Build Character Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Character Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Character Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Character Sheet": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Blueprint V2",
+      "id": "blueprint-v2"
+    },
+    {
+      "name": "CometAPI",
+      "id": "cometapi"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-01T11:30:00.000Z",
+  "versionId": "2"
+}
