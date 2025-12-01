@@ -1,436 +1,359 @@
-# 🚀 Tuyul Digital Web3 - Automated Crypto Content Engine
+# 🎬 Project Blueprint V2: YouTube Shorts Automasi (Google Ecosystem Edition)
 
-**Workflow n8n otomatis untuk generate konten viral tentang Crypto, Blockchain, dan Web3 Presale**
-
-> Sistem otomasi yang mengubah berita crypto menjadi konten viral (artikel, video script, social media) dengan AI - fully automated!
+**Update Desember 2025: Menggunakan Google Veo 3.1 dan Gemini 2.5 Flash Image untuk alur kerja yang lebih ringkas dan hemat biaya.**
 
 ---
 
 ## 📋 Daftar Isi
 
-- [Overview](#overview)
-- [Features](#features)
-- [Majelis.info Digital Marketing](#majelisinfo-digital-marketing)
-- [Quick Start](#quick-start)
-- [Arsitektur](#arsitektur)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Konfigurasi](#konfigurasi)
-- [Output Examples](#output-examples)
-- [Cost Estimation](#cost-estimation)
-- [Troubleshooting](#troubleshooting)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
+- [Perubahan Strategi Utama](#1-perubahan-strategi-utama)
+- [Arsitektur Workflow Baru](#2-arsitektur-workflow-baru-n8n-flow)
+- [Perbandingan Alat](#3-perbandingan-alat-tech-stack-update)
+- [Langkah Taktis Memulai](#4-langkah-taktis-memulai-untuk-pemula-n8n)
+- [Prompt Rahasia](#5-prompt-rahasia-untuk-nano-banana-gemini-flash-image)
+- [Detail Implementasi Teknis](#6-detail-implementasi-teknis-prompts--json)
+- [Quick Links](#quick-links)
 
 ---
 
-## 🎯 Overview
+## 1. Perubahan Strategi Utama
 
-**Tuyul Digital Web3** adalah workflow n8n yang sepenuhnya otomatis untuk:
+Dengan **Veo 3.1**, kita bisa memangkas kerumitan.
 
-1. 📰 **Fetch** berita terbaru tentang crypto presale, blockchain, Web3
-2. 🤖 **Research** otomatis dengan AI (DeepSeek R1/V3)
-3. ✍️ **Generate** konten multi-format:
-   - Artikel blog lengkap (800-1000 kata)
-   - Script video pendek 60 detik (TikTok/Reels/Shorts)
-   - Caption media sosial + hashtag strategy
-4. 🎨 **Create** gambar thumbnail dengan AI (Flux AI)
-5. 📤 **Publish** otomatis ke WordPress, Telegram, dll
-6. 💾 **Archive** ke Google Sheets untuk tracking
+### Dulu
+```
+Text → Image → Video (Bisu) → Generate Suara Terpisah → Edit Gabung
+```
 
-**Goal:** Konten edukasi crypto berkualitas, konsisten, dan viral - tanpa manual work!
+### Sekarang (Veo 3.1)
+```
+Text/Image → Video + Audio (SFX & Ambience) sekaligus
+```
 
-## 🌐 Majelis.info Digital Marketing
-
-Paket baru untuk orkestrasi **digital marketing Majelis.info** berbasis CometAPI:
-
-- Workflow n8n siap pakai: `workflows/majelis-digital-marketing.json` (branch model Nano/Veo/Sora dengan Google Sheets + CometAPI + OpenAI Vision)
-- Catatan konsep & eksekusi: [docs/MAJELIS-DIGITAL-MARKETING.md](docs/MAJELIS-DIGITAL-MARKETING.md)
-- Fokus: riset topik → prompt UGC selfie → render gambar/video → CTA chatbot (WA/DM) + distribusi ke Reels/TikTok/Shorts
-- Cara pakai singkat: duplikat template Google Sheet, import workflow ke n8n, sambungkan kredensial `Google Sheets account 2`, `cometapi`, dan `CometAPI`, lalu jalankan 1 baris test untuk mengisi kolom `Finished Video`.
+**Keuntungan:**
+- ✅ Lebih cepat (1 step vs 5 steps)
+- ✅ Lebih murah (satu API call)
+- ✅ Audio terintegrasi (sound effects + ambience)
+- ✅ Konsistensi lebih baik
 
 ---
 
-## ✨ Features
+## 2. Arsitektur Workflow Baru (n8n Flow)
 
-### Core Features
-- ✅ Scheduled automation (cron trigger)
-- ✅ Multi-source news aggregation
-- ✅ AI-powered research & analysis
-- ✅ Multi-format content generation
-- ✅ AI image generation
-- ✅ Auto-publish to multiple platforms
-- ✅ Data archiving & tracking
+### Tahap 1: The Director (Tetap Sama)
 
-### Content Output
-- 📝 **SEO-optimized blog article** (Bahasa Indonesia)
-- 🎬 **60-second video script** with scene breakdown
-- 📱 **Social media caption** with hashtags
-- 🖼️ **AI-generated thumbnail** image
+**Trigger:** Topik Manual / Tren
 
-### Integrations
+**Node 1 (LLM - Gemini 1.5 Pro):**
+- **Tugas:** Menulis naskah dengan struktur **Conflict Arc**
+- **Penting:** Minta output prompt visual yang sangat spesifik untuk konsistensi karakter
+  - Contoh: *"A young gamer boy with a red hoodie, anime style"*
 
-**Content Generation:**
-- 🔗 NewsAPI (berita crypto)
-- 🧠 DeepSeek AI (research & content) - *Cheaper & Cooler!*
-- 🎨 HuggingFace Flux AI (gambar)
+### Tahap 2: The Visual Factory (Updated)
 
-**Publishing Platforms:**
-- 📺 **YouTube Shorts** - Auto-upload dengan API
-- 🎵 **TikTok** - Content Posting API
-- 📸 **Instagram Reels** - Meta Graph API
-- 👥 **Facebook Reels** - Meta Graph API
-- 📄 WordPress (artikel blog)
-- 💬 Telegram (channel & notifikasi)
+**Node 2: Image Gen (Karakter & Aset)**
 
-**Storage & Analytics:**
-- 📊 Google Sheets (archiving)
-- ☁️ AWS S3 / Cloudinary (video hosting)
+- **Model:** Gemini 2.5 Flash Image ("Nano Banana")
+- **Kenapa ini?**
+  - ✅ Sangat cepat
+  - ✅ Murah
+  - ✅ Punya fitur **"Subject Consistency"**
+- **Cara Kerja:**
+  1. Generate 1 gambar karakter utama
+  2. Pakai gambar itu sebagai referensi untuk shot selanjutnya
+  3. Wajah karakter tidak berubah-ubah (masalah utama video AI)
+
+**Alternatif Mudah:**
+- Jika node ini sulit disetting manual, gunakan node **"Google AI Studio"** di n8n dan pilih model `gemini-2.5-flash-image`
+
+**Node 3: Video Gen (The Engine)**
+
+- **Model:** Google Veo 3.1 (via Vertex AI / Gemini API)
+
+**Fitur Wajib Pakai:**
+1. **Image-to-Video:** Masukkan gambar dari Node 2
+2. **Native Audio Generation:** Centang opsi audio - Veo 3.1 otomatis membuat:
+   - Suara langkah kaki
+   - Ledakan
+   - Angin
+   - Sound effects lainnya sesuai video
+3. **Prompting:** `"Cinematic shot, [Action], high quality audio"`
+
+### Tahap 3: The Assembly (Penyatuan)
+
+Meskipun Veo hebat, dia menghasilkan klip-klip terpisah (misal 5-10 detik per klip). Kita tetap butuh "Lem" untuk menyatukannya.
+
+**Node 4 (Voiceover - Opsional):**
+- Veo 3.1 bisa generate dialog, tapi kadang belum sempurna untuk naskah panjang
+- **Saran:** Gunakan **Google Cloud Text-to-Speech (Journey Voice)** untuk Narator utama
+- Biarkan Veo menangani sound effect (suara latar)
+
+**Node 5 (Cloud Editor - Creatomate):**
+- Menggabungkan klip Veo 3.1 + Narasi
+- Menambahkan **Subtitle Otomatis** (wajib untuk Shorts)
+- Menambahkan **musik latar** (background music) yang konsisten
 
 ---
 
-## ⚡ Quick Start
+## 3. Perbandingan Alat (Tech Stack Update)
 
-**10 menit dari nol ke workflow jalan!**
+| Fungsi | Alat Lama | Pilihan Baru (Lebih Mudah & Canggih) |
+|--------|-----------|---------------------------------------|
+| **Image Model** | Flux / Midjourney | **Gemini 2.5 Flash Image** ("Nano Banana")<br/>✅ Lebih mudah diintegrasikan di n8n karena native Google |
+| **Video Model** | Runway Gen-3 | **Google Veo 3.1**<br/>✅ Menang di Audio & Konsistensi |
+| **Konsistensi** | Latih LoRA (Rumit) | **Veo "Ingredients"**<br/>✅ Upload gambar karakter, Veo akan menjaganya tetap sama |
+| **Biaya** | Mahal ($90+/bulan untuk berbagai sub) | **Pay-as-you-go**<br/>✅ Bayar per generate via Google Cloud, jauh lebih murah untuk pemula |
+
+---
+
+## 4. Langkah Taktis Memulai (Untuk Pemula n8n)
+
+Jika Anda merasa script n8n rumit, lakukan ini bertahap:
+
+### Level 1 (Semi-Manual)
+1. Gunakan **Google AI Studio** (gratis/murah) di browser
+2. Generate gambar pakai **Gemini 2.5 Flash** ("Nano Banana")
+3. Generate video pakai **Veo 3.1**
+4. Edit manual di **CapCut**
+
+**Lakukan ini untuk 5 video pertama agar paham polanya.**
+
+### Level 2 (Automasi Aset)
+1. Buat workflow n8n sederhana:
+   - Input Topik
+   - Generate 5 Prompt Gambar
+   - Generate 5 Gambar (Gemini Flash)
+   - Save to Google Drive
+2. Anda tinggal ambil gambar di Drive, lalu animasikan manual
+
+### Level 3 (Full Auto)
+- Baru sambungkan **Veo 3.1** dan **Creatomate** di n8n setelah Level 2 lancar
+
+---
+
+## 5. Prompt Rahasia untuk "Nano Banana" (Gemini Flash Image)
+
+Agar gambar konsisten, gunakan struktur prompt ini di n8n:
+
+```
+Character Sheet of [Character Name], [Description], distinct facial features,
+wearing [Clothing], front view, side view, back view, flat lighting, neutral background.
+```
+
+**Contoh:**
+```
+Character Sheet of Alex the Gamer, young Asian male with short black hair,
+distinct round glasses, wearing red gaming hoodie with logo, front view, side view,
+back view, flat lighting, neutral background.
+```
+
+**Gunakan hasil "Character Sheet" ini sebagai Reference Image saat meminta Veo 3.1 membuat video.**
+
+---
+
+## 6. Detail Implementasi Teknis (Prompts & JSON)
+
+Bagian ini bisa Anda copy-paste langsung ke dalam node n8n Anda.
+
+### A. System Prompt untuk "The Director" (Node Gemini 1.5 Pro)
+
+Isi ini di bagian **System Instruction** pada node Google Gemini Chat di n8n.
+
+```
+ROLE: Anda adalah Sutradara YouTube Shorts Viral kelas dunia yang ahli dalam "Conflict Arc Storytelling".
+
+TUGAS: Buat naskah video 60 detik berdasarkan TOPIK yang diberikan user.
+
+STRUKTUR CERITA (WAJIB):
+1. HOOK (0-3 detik): Visual mengejutkan atau pertanyaan provokatif. Jangan ada intro "Halo guys". Langsung ke aksi.
+2. RISING ACTION (3-15 detik): Perkenalkan karakter dan tujuannya.
+3. THE CONFLICT (15-30 detik): Masalah besar muncul (Hacker, Error, Musuh, Kehabisan waktu).
+4. THE COMEBACK (30-50 detik): Solusi cerdas atau momen heroik.
+5. THE PAYOFF (50-60 detik): Hasil akhir yang memuaskan + Call to Action (CTA) halus.
+
+FORMAT OUTPUT (JSON ONLY):
+Hanya berikan output JSON mentah tanpa markdown ```json.
+{
+  "title": "Judul Clickbait (Max 50 char)",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "duration_seconds": 3,
+      "voiceover_script": "Teks yang dibaca narator...",
+      "visual_prompt": "Deskripsi visual SANGAT DETAIL untuk AI Image Generator. Jelaskan subjek, aksi, pencahayaan, dan sudut kamera (misal: low angle, cinematic lighting).",
+      "sound_effect_prompt": "Deskripsi suara latar untuk Veo 3.1 (misal: loud explosion, fast footsteps)"
+    },
+    ... (lanjutkan sampai selesai)
+  ]
+}
+```
+
+### B. Konfigurasi Node Veo 3.1 (HTTP Request)
+
+Jika belum ada node resmi Veo, gunakan **HTTP Request** ke Vertex AI.
+
+**Method:** `POST`
+
+**URL:**
+```
+https://us-central1-aiplatform.googleapis.com/v1/projects/[YOUR_PROJECT_ID]/locations/us-central1/publishers/google/models/veo-003-1:predict
+```
+
+**Body (JSON):**
+```json
+{
+  "instances": [
+    {
+      "prompt": "{{ $json.visual_prompt }}",
+      "image_storage_uri": "gs://[bucket_name]/[character_ref_image.png]",
+      "audio_prompt": "{{ $json.sound_effect_prompt }}"
+    }
+  ],
+  "parameters": {
+    "sampleCount": 1,
+    "videoLength": "5s",
+    "aspectRatio": "9:16"
+  }
+}
+```
+
+**Catatan:** Pastikan Anda mengganti variabel dengan expression n8n yang sesuai.
+
+### C. Contoh Workflow JSON Output
+
+Hasil dari Node 1 (The Director) akan seperti ini:
+
+```json
+{
+  "title": "Hacker Serang Server! Bisakah Kita Bertahan?",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "duration_seconds": 3,
+      "voiceover_script": "Server kita diserang hacker dengan 10,000 requests per detik!",
+      "visual_prompt": "Close-up of computer screen showing red warning alerts and attack graphs, dramatic red lighting, screen reflection on worried face, cinematic angle",
+      "sound_effect_prompt": "Intense alarm sounds, keyboard typing rapidly"
+    },
+    {
+      "scene_number": 2,
+      "duration_seconds": 12,
+      "voiceover_script": "Tim DevOps harus segera bertindak. Firewall mulai overload.",
+      "visual_prompt": "Young Asian developer in red hoodie frantically typing on mechanical keyboard, multiple monitors showing code and graphs, blue screen glow, over-shoulder shot",
+      "sound_effect_prompt": "Mechanical keyboard clicks, computer fan whirring"
+    }
+  ]
+}
+```
+
+---
+
+## 📊 Estimasi Biaya
+
+### Google Cloud (Pay-as-you-go)
+
+| Service | Cost per Unit | Monthly (30 videos) |
+|---------|---------------|---------------------|
+| Gemini 1.5 Pro (Script) | ~$0.001/request | ~$0.03 |
+| Gemini 2.5 Flash Image | ~$0.0005/image | ~$0.075 (5 images/video) |
+| Veo 3.1 Video | ~$0.10/video clip | ~$15 (5 clips/video) |
+| Text-to-Speech | ~$0.000016/char | ~$0.48 |
+| Cloud Storage | ~$0.02/GB | ~$0.60 |
+| **TOTAL** | | **~$16.19/month** |
+
+**Jauh lebih murah** dibanding subscription model ($90+/month)!
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+1. **Google Cloud Account** dengan billing enabled
+2. **n8n Instance** (Cloud atau self-hosted)
+3. **API Access** untuk:
+   - Vertex AI (Veo 3.1)
+   - Gemini API (Flash Image & Pro)
+   - Cloud Text-to-Speech (optional)
+
+### Setup Steps
 
 ```bash
-# 1. Clone repo
+# 1. Clone repository
 git clone https://github.com/cupitebet/n8nVideoPendek.git
 cd n8nVideoPendek
 
 # 2. Install n8n (via Docker)
 docker run -d --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
 
-# 3. Buka n8n
-# Akses: http://localhost:5678
+# 3. Access n8n
+# URL: http://localhost:5678
 
 # 4. Import workflow
-# Upload file: workflows/majelis-digital-marketing.json
+# Upload file: workflows/youtube-shorts-veo-v2.json
 
-# 5. Setup credentials (minimal):
-# - DeepSeek API Key (via OpenAI credential)
-# - NewsAPI Key
+# 5. Setup Google Cloud credentials
+# - Create service account
+# - Download JSON key
+# - Add to n8n credentials
 
 # 6. Test run!
-# Execute workflow manual, lihat hasilnya
 ```
 
-**Dokumentasi lengkap:** [docs/QUICKSTART.md](docs/QUICKSTART.md)
+### Test Your First Video
+
+1. Open workflow in n8n
+2. Input topic: "AI Revolution in Gaming"
+3. Execute workflow
+4. Check outputs:
+   - ✅ Script generated
+   - ✅ Character images created
+   - ✅ Video clips generated
+   - ✅ Final video assembled
 
 ---
 
-## 📱 Social Media Integration (NEW!)
+## 🎯 Best Practices
 
-Upload video otomatis ke semua platform short-form video!
+### 1. Character Consistency
+- Always create a "Character Sheet" first
+- Use the same character reference for all clips
+- Keep character descriptions detailed but consistent
 
-### Supported Platforms
+### 2. Prompt Engineering
+- Be specific with visual descriptions
+- Include camera angles and lighting
+- Mention mood and atmosphere
+- Add sound effect descriptions for Veo 3.1
 
-| Platform | Status | Setup Time | Auto-Upload |
-|----------|--------|------------|-------------|
-| **YouTube Shorts** | ✅ Ready | 30 min | ✅ |
-| **TikTok** | ⏳ Needs Approval | 1-2 weeks | ✅ |
-| **Instagram Reels** | ✅ Ready | 45 min | ✅ |
-| **Facebook Reels** | ✅ Ready | 45 min | ✅ |
-| **Telegram** | ✅ Ready | 5 min | ✅ |
+### 3. Video Structure
+- Keep HOOK under 3 seconds
+- Build tension progressively
+- Include clear visual transitions
+- End with strong CTA
 
-### Quick Setup
-
-**Start Here:** [API Quick Start Guide](docs/API-QUICK-START.md) - Setup semua platform dalam 1-2 minggu
-
-**Platform-Specific Guides:**
-- 📺 [YouTube Shorts API Setup](docs/API-SETUP-YOUTUBE.md)
-- 🎵 [TikTok API Setup](docs/API-SETUP-TIKTOK.md)
-- 📸 [Instagram Reels API Setup](docs/API-SETUP-INSTAGRAM.md)
-- 👥 [Facebook Reels API Setup](docs/API-SETUP-FACEBOOK.md)
-
-**Complete Guide:** [Social Media Complete Guide](docs/SOCIAL-MEDIA-COMPLETE-GUIDE.md)
-
-**Add to Workflow:** [Workflow Social Media Nodes](docs/WORKFLOW-SOCIAL-MEDIA-NODES.md)
+### 4. Cost Optimization
+- Start with Level 1 (manual) to learn the pattern
+- Test prompts before full automation
+- Use Gemini Flash Image (cheaper) instead of Pro
+- Monitor Google Cloud billing alerts
 
 ---
 
-## 🎬 Video Generation (NEW!)
+## 📚 Additional Resources
 
-Workflow generates **video script** - you need to add **video creation**!
+### Documentation
+- [Google Veo 3.1 Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/video/overview)
+- [Gemini 2.5 Flash Image Guide](https://ai.google.dev/gemini-api/docs/vision)
+- [n8n Workflow Best Practices](https://docs.n8n.io/workflows/best-practices/)
 
-### Current Status
-- ✅ AI generates 60-second script with scene breakdown
-- ✅ Caption & hashtags ready
-- ✅ Thumbnail image created
-- ❌ **Need:** Actual video file (MP4)
+### Example Workflows
+- `workflows/youtube-shorts-veo-v2.json` - Full automation workflow
+- `workflows/youtube-shorts-manual.json` - Semi-manual workflow for beginners
+- `examples/sample-scripts/` - Example video scripts
 
-### Solution Options
-
-| Method | Cost | Setup | Quality | Automation |
-|--------|------|-------|---------|------------|
-| **Pictory.ai API** | $29-119/mo | 1 hour | ⭐⭐⭐⭐⭐ | ✅ Full |
-| **Manual (Canva/CapCut)** | Free | 10-20 min/video | ⭐⭐⭐⭐ | ❌ Manual |
-| **Hybrid Approach** | $29+/mo | Mixed | ⭐⭐⭐⭐⭐ | ⚡ Semi |
-
-### Quick Start Guides
-
-**Choose your path:**
-
-1. **🤖 Full Automation** → [Pictory.ai Integration](docs/VIDEO-GENERATION-PICTORY.md)
-   - Text-to-video otomatis
-   - AI voice-over & stock footage
-   - 2-5 minutes processing per video
-
-2. **✋ Manual Creation** → [Manual Workflow Guide](docs/VIDEO-GENERATION-MANUAL.md)
-   - Free tools: Canva, CapCut
-   - 10-20 minutes per video
-   - High quality control
-
-3. **📊 Compare All Options** → [Video Generation Options](docs/VIDEO-GENERATION-OPTIONS.md)
-
-**Integration:** [Add Video to Existing Workflow](docs/WORKFLOW-ADD-VIDEO-GENERATION.md)
-
----
-
-## 🏗️ Arsitektur
-
-```
-┌─────────────────┐
-│ Schedule Trigger│  (Daily 8AM WIB)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Fetch News API  │  (NewsAPI - crypto presale)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Filter Keywords │  (presale, web3, AI, L2, etc)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ AI Research     │  (GPT-4o-mini - analyze project)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ AI Content Gen  │  (GPT-4o-mini - article+script+caption)
-└────────┬────────┘
-         │
-         ├──────────────┬──────────────┬──────────────┐
-         ▼              ▼              ▼              ▼
-    ┌────────┐    ┌─────────┐    ┌──────────┐  ┌──────────┐
-    │ Image  │    │WordPress│    │ Telegram │  │ Sheets   │
-    │Generate│    │ Publish │    │  Publish │  │ Archive  │
-    └────────┘    └─────────┘    └──────────┘  └──────────┘
-```
-
-**Detail:** [docs/README.md](docs/README.md)
-
----
-
-## 📦 Installation
-
-### Prerequisites
-- n8n instance (Cloud atau self-hosted)
-- API Keys:
-  - ✅ OpenAI
-  - ✅ NewsAPI
-  - 🔧 HuggingFace (opsional - untuk gambar)
-  - 🔧 WordPress credentials (opsional)
-  - 🔧 Telegram Bot (opsional)
-  - 🔧 Google Sheets (opsional)
-
-### Step-by-Step
-
-**1. Setup n8n:**
-```bash
-# Docker (recommended)
-docker run -d --restart unless-stopped --name n8n \
-  -p 5678:5678 \
-  -v ~/.n8n:/home/node/.n8n \
-  n8nio/n8n
-
-# Atau via npm
-npm install n8n -g
-n8n start
-```
-
-**2. Import Workflow:**
-- Download `workflows/tuyul-digital-web3.json`
-- Di n8n: Workflows > Import from File
-- Upload JSON
-
-**3. Setup Credentials:**
-
-Lihat template di `config/credentials-template.json`
-
-Minimal yang wajib:
-- OpenAI API (untuk AI research & content)
-- NewsAPI Key (untuk fetch berita)
-
-**4. Configure Settings:**
-
-Edit `config/settings.json` sesuai kebutuhan:
-```json
-{
-  "schedule_cron": "0 8 * * *",
-  "max_items_per_run": 3,
-  "filter_keywords": ["presale", "web3", "AI", ...]
-}
-```
-
-**5. Test & Activate:**
-- Manual test dulu
-- Cek output
-- Aktifkan schedule
-
-**Panduan lengkap:** [docs/INSTALLATION.md](docs/INSTALLATION.md)
-
----
-
-## 🎮 Usage
-
-### Manual Execution
-1. Buka workflow di n8n
-2. Click "Execute Workflow"
-3. Lihat hasil di setiap node
-
-### Scheduled Automation
-1. Pastikan "Schedule Trigger" enabled
-2. Set cron schedule (default: 8AM daily)
-3. Activate workflow
-4. Workflow akan jalan otomatis sesuai schedule
-
-### Monitoring
-- **Executions tab:** Lihat history run
-- **Node output:** Debug hasil tiap step
-- **Google Sheets:** Archive untuk tracking
-
-### Customization
-
-**Edit Prompts:**
-- Research: `prompts/research-prompt.txt`
-- Content: `prompts/content-generation-prompt.txt`
-
-**Edit Keywords:**
-- Filter: `config/settings.json` > `filter_keywords`
-
-**Edit Schedule:**
-- Di node "Schedule Trigger" > ganti cron expression
-- Default: `0 8 * * *` (8AM daily)
-
----
-
-## ⚙️ Konfigurasi
-
-### Filter Keywords
-
-Edit di `config/settings.json`:
-
-```json
-{
-  "filter_keywords": [
-    "presale",
-    "web3",
-    "blockchain",
-    "AI",
-    "L2",
-    "DeFi",
-    "NFT",
-    "gaming",
-    "RWA",
-    "airdrop"
-  ]
-}
-```
-
-### AI Models
-
-```json
-{
-  "ai_models": {
-    "research_model": "deepseek-reasoner",
-    "content_generation_model": "deepseek-chat",
-    "research_temperature": 0.6,
-    "content_temperature": 1.0
-  }
-}
-```
-
-### Schedule
-
-Cron expressions:
-- `0 8 * * *` - Daily at 8AM
-- `0 8,14,20 * * *` - 3x per day (8AM, 2PM, 8PM)
-- `0 */6 * * *` - Every 6 hours
-
----
-
-## 📊 Output Examples
-
-### Research Output
-```json
-{
-  "project_name": "ChainGPT",
-  "category": "AI",
-  "verdict": "BULLISH",
-  "tokenomics": {...},
-  "risk_flags": [...],
-  "opportunities": [...]
-}
-```
-
-**Full example:** [examples/sample-research-output.json](examples/sample-research-output.json)
-
-### Content Output
-```json
-{
-  "article": {
-    "title": "ChainGPT: AI Revolution di Blockchain...",
-    "content": "<h1>...</h1>...",
-    "tags": [...]
-  },
-  "video_script": {
-    "hook": "Guys, ada AI yang bisa audit...",
-    "scenes": [...]
-  },
-  "social_caption": {
-    "caption": "🤖 AI yang bisa audit...",
-    "hashtags": [...]
-  }
-}
-```
-
-**Full example:** [examples/sample-content-output.json](examples/sample-content-output.json)
-
----
-
-## 💰 Cost Estimation
-
-### Monthly Cost (Estimasi)
-
-**Minimal Setup (1 artikel/hari):**
-- DeepSeek AI: ~$0.5-1/bulan (Sangat Murah!)
-- NewsAPI Free Tier: $0
-- **Total: $0.5-1/bulan**
-
-**Full Setup (3 artikel/hari + gambar):**
-- DeepSeek AI: ~$1-2/bulan
-- NewsAPI Free Tier: $0
-- HuggingFace Free: $0 (rate limited)
-- **Total: $1-2/bulan**
-
-**Pro Setup:**
-- OpenAI GPT-4o: ~$50-100/bulan
-- NewsAPI Paid: $449/bulan
-- Stability AI: ~$10-20/bulan
-- **Total: $500+/bulan**
-
-**Recommendation:** Mulai dari Minimal Setup, scale up sesuai kebutuhan.
-
-### Per-Execution Cost
-- Research (DeepSeek R1): ~$0.00005
-- Content Gen (DeepSeek V3): ~$0.00002
-- Image (Flux): $0 (free tier, limited)
-- **Total per run:** ~$0.0001 (1 artikel)
+### Templates
+- `prompts/director-prompt.txt` - The Director system prompt
+- `prompts/character-sheet-template.txt` - Character consistency template
+- `config/veo-settings.json` - Veo 3.1 configuration template
 
 ---
 
@@ -438,69 +361,53 @@ Cron expressions:
 
 ### Common Issues
 
-**Error: "Unauthorized" / "Invalid API Key"**
-- ✅ Cek API key valid
-- ✅ Re-setup credential di n8n
-- ✅ Pastikan billing enabled (OpenAI)
+**Error: "Quota exceeded" pada Veo 3.1**
+- ✅ Check Google Cloud quota limits
+- ✅ Request quota increase di console
+- ✅ Reduce video generation frequency
 
-**Error: "Rate limit exceeded"**
-- ✅ NewsAPI free: max 100 req/day
-- ✅ Kurangi frequency atau upgrade plan
-- ✅ Tambah delay antar request
+**Karakter tidak konsisten antar klip**
+- ✅ Pastikan menggunakan character reference image
+- ✅ Gunakan prompt yang lebih spesifik
+- ✅ Tambahkan "Subject Consistency" di Gemini Flash
 
-**No items filtered**
-- ✅ Berita mungkin tidak match keywords
-- ✅ Adjust filter keywords lebih general
-- ✅ Test dengan keyword lain
+**Audio tidak sinkron dengan video**
+- ✅ Gunakan Veo 3.1 native audio untuk SFX
+- ✅ Tambahkan voiceover terpisah via TTS
+- ✅ Edit manual di Creatomate jika perlu
 
-**Content quality rendah**
-- ✅ Edit prompt di `prompts/`
-- ✅ Tambah examples di prompt
-- ✅ Coba model lebih besar (GPT-4o)
-- ✅ Adjust temperature (0.7-0.9)
-
-**Gambar tidak generate**
-- ✅ HuggingFace free tier lambat/limited
-- ✅ Tunggu beberapa saat atau retry
-- ✅ Alternatif: Stability AI, DALL-E
+**Video quality rendah**
+- ✅ Gunakan prompt yang lebih detail
+- ✅ Specify "high quality, 4K, cinematic" di prompt
+- ✅ Adjust Veo 3.1 quality settings
 
 ---
 
 ## 🗺️ Roadmap
 
-### Phase 1: Core (✅ Done)
-- [x] Workflow dasar (fetch, research, content)
-- [x] AI integration (OpenAI)
-- [x] Multi-platform publish
-- [x] Documentation lengkap
+### Phase 1: Foundation ✅
+- [x] Blueprint V2 documentation
+- [x] Basic workflow structure
+- [x] Google Cloud integration guide
+- [x] Cost estimation
 
-### Phase 2: Social Media Integration (✅ Done)
-- [x] TikTok API integration & documentation
-- [x] YouTube Shorts upload & documentation
-- [x] Instagram Reels posting & documentation
-- [x] Facebook Reels posting & documentation
-- [x] Complete API setup guides untuk semua platform
-- [x] Workflow nodes untuk multi-platform upload
+### Phase 2: Automation 🚧
+- [ ] Complete n8n workflow JSON
+- [ ] Character consistency system
+- [ ] Automated subtitle generation
+- [ ] Music library integration
 
-### Phase 3: Video Generation (🚧 Next)
-- [ ] Text-to-video integration (Pictory, Synthesia)
-- [ ] Voice-over generation (ElevenLabs)
-- [ ] Template-based video creation
-- [ ] Stock footage integration
+### Phase 3: Optimization 📋
+- [ ] A/B testing framework
+- [ ] Analytics integration
+- [ ] Multi-platform publishing
+- [ ] Template library
 
-### Phase 4: Advanced Analytics (📋 Planned)
+### Phase 4: Scale 💡
+- [ ] Batch processing
+- [ ] Queue management
 - [ ] Multi-language support
-- [ ] Sentiment analysis
-- [ ] Trend prediction with ML
-- [ ] A/B testing content
-- [ ] Analytics dashboard
-- [ ] Community feedback loop
-
-### Phase 4: Scale (💡 Future)
-- [ ] Multiple niches (not just crypto)
 - [ ] White-label solution
-- [ ] API untuk developer
-- [ ] Monetization features
 
 ---
 
@@ -517,10 +424,10 @@ Kontribusi sangat welcome!
 
 ### Areas to Contribute:
 - 🐛 Bug fixes
-- ✨ New features
-- 📝 Documentation
-- 🎨 Prompt optimization
-- 🔧 Integration baru
+- ✨ New features (Veo 3.1 optimizations)
+- 📝 Documentation improvements
+- 🎨 Prompt template library
+- 🔧 New integrations
 - 🌐 Translations
 
 ---
@@ -535,9 +442,9 @@ MIT License - feel free to use, modify, distribute!
 
 **Built with:**
 - [n8n](https://n8n.io) - Workflow automation
-- [OpenAI](https://openai.com) - GPT models
-- [NewsAPI](https://newsapi.org) - News aggregation
-- [HuggingFace](https://huggingface.co) - AI image generation
+- [Google Veo 3.1](https://deepmind.google/technologies/veo/) - Video generation
+- [Gemini 2.5 Flash](https://ai.google.dev/gemini-api) - Image & text generation
+- [Creatomate](https://creatomate.com) - Video editing automation
 
 **Created by:** Cupi & Claude AI
 
@@ -547,21 +454,21 @@ MIT License - feel free to use, modify, distribute!
 
 - 📖 **Documentation:** [docs/](docs/)
 - 💬 **Issues:** [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
-- 📧 **Email:** [your-email]
-- 💬 **Telegram:** [your-telegram]
+- 📧 **Email:** [Contact Support]
+- 💬 **Community:** [Join Discord/Telegram]
 
 ---
 
 ## ⚡ Quick Links
 
-- [Quick Start Guide](docs/QUICKSTART.md) - Setup dalam 10 menit
-- [Installation Guide](docs/INSTALLATION.md) - Setup lengkap step-by-step
-- [Full Documentation](docs/README.md) - Dokumentasi arsitektur
-- [Config Template](config/settings.json) - Template konfigurasi
-- [Prompt Templates](prompts/) - Customize AI prompts
+- [Quick Start Guide](#quick-start) - Setup dalam 10 menit
+- [Tech Stack Comparison](#3-perbandingan-alat-tech-stack-update) - Lihat perbandingan tools
+- [Prompt Templates](#6-detail-implementasi-teknis-prompts--json) - Copy-paste prompts
+- [Cost Calculator](#estimasi-biaya) - Hitung biaya operasional
+- [Troubleshooting Guide](#troubleshooting) - Solusi masalah umum
 
 ---
 
-**Happy Automating! 🚀**
+**Happy Creating! 🎬**
 
-*"Bikin konten viral, tanpa harus begadang coding" - Tuyul Digital Web3*
+*"From Idea to Viral Shorts in Minutes, Not Hours" - YouTube Shorts Automasi V2*
