@@ -65,8 +65,8 @@
       ],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "cometapi",
-          "name": "CometAPI"
+          "id": "P87zYQbFzQbyKvMl",
+          "name": "cometapi"
         }
       },
       "notes": "Generate script via CometAPI - Uses n8n credential"
@@ -127,8 +127,8 @@
       ],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "cometapi",
-          "name": "CometAPI"
+          "id": "P87zYQbFzQbyKvMl",
+          "name": "cometapi"
         }
       },
       "notes": "Gemini 2.5 Flash Image via CometAPI - Uses n8n credential"
@@ -175,8 +175,8 @@
       ],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "cometapi",
-          "name": "CometAPI"
+          "id": "P87zYQbFzQbyKvMl",
+          "name": "cometapi"
         }
       },
       "notes": "Veo 3 video generation via CometAPI - Uses n8n credential"
@@ -226,8 +226,8 @@
       ],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "cometapi",
-          "name": "CometAPI"
+          "id": "P87zYQbFzQbyKvMl",
+          "name": "cometapi"
         }
       },
       "notes": "Check video status via CometAPI - Uses n8n credential"
