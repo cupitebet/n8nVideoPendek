@@ -3,24 +3,38 @@
   "nodes": [
     {
       "parameters": {
-        "values": {
-          "string": [
+        "rule": {
+          "interval": [
             {
-              "name": "topic",
-              "value": "AI in Gaming"
+              "field": "hours",
+              "hoursInterval": 6
             }
           ]
-        },
-        "options": {}
+        }
       },
-      "id": "manual-trigger",
-      "name": "Input: Set Topic",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.3,
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
       "position": [
         250,
         300
-      ]
+      ],
+      "notes": "Run every 6 hours"
+    },
+    {
+      "parameters": {
+        "jsCode": "// List of topics to rotate\nconst topics = [\n  'AI Revolution in Gaming',\n  'Future of Digital Marketing with AI',\n  'Cara AI Mengubah Dunia Kerja',\n  'Metaverse dan Web3 untuk Pemula',\n  'Crypto Trading Tips untuk Newbie',\n  'NFT Opportunities in 2025',\n  'ChatGPT Hacks untuk Produktivitas',\n  'Blockchain Beyond Cryptocurrency'\n];\n\n// Get current date/time to rotate topics\nconst now = new Date();\nconst hourOfDay = now.getHours();\nconst topicIndex = Math.floor(hourOfDay / 6) % topics.length;\n\n// Select topic based on time\nconst selectedTopic = topics[topicIndex];\n\nreturn {\n  json: {\n    topic: selectedTopic,\n    scheduled_at: now.toISOString(),\n    topic_index: topicIndex\n  }\n};"
+      },
+      "id": "set-topic",
+      "name": "Set Topic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ],
+      "notes": "Rotate through topic list"
     },
     {
       "parameters": {
@@ -43,14 +57,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"gemini-1.5-pro\\\",\\n  \\\"messages\\\": [\\n    {\\n      \\\"role\\\": \\\"system\\\",\\n      \\\"content\\\": `ROLE: Sutradara YouTube Shorts Viral kelas dunia.\\n\\nTUGAS: Buat naskah 60 detik dengan Conflict Arc.\\n\\nSTRUKTUR:\\n1. HOOK (0-3s): Visual mengejutkan\\n2. RISING (3-15s): Perkenalan karakter\\n3. CONFLICT (15-30s): Masalah besar\\n4. COMEBACK (30-50s): Solusi heroik\\n5. PAYOFF (50-60s): Hasil + CTA\\n\\nOUTPUT JSON:\\n{\\n  \\\"title\\\": \\\"...\\\",\\n  \\\"scenes\\\": [\\n    {\\n      \\\"scene_number\\\": 1,\\n      \\\"duration_seconds\\\": 3,\\n      \\\"voiceover_script\\\": \\\"...\\\",\\n      \\\"visual_prompt\\\": \\\"Detail visual untuk AI...\\\",\\n      \\\"sound_effect_prompt\\\": \\\"Sound effects...\\\"\\n    }\\n  ]\\n}`\\n    },\\n    {\\n      \\\"role\\\": \\\"user\\\",\\n      \\\"content\\\": `Topic: ${$json.topic}\\n\\nGenerate 60-second script dengan 5 scenes.`\\n    }\\n  ],\\n  \\\"temperature\\\": 0.7,\\n  \\\"response_format\\\": { \\\"type\\\": \\\"json_object\\\" }\\n} }}"
+        "jsonBody": "={{ {\n  \"model\": \"gemini-1.5-pro\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": `ROLE: Sutradara YouTube Shorts Viral kelas dunia.\n\nTUGAS: Buat naskah 60 detik dengan Conflict Arc.\n\nSTRUKTUR:\n1. HOOK (0-3s): Visual mengejutkan\n2. RISING (3-15s): Perkenalan karakter\n3. CONFLICT (15-30s): Masalah besar\n4. COMEBACK (30-50s): Solusi heroik\n5. PAYOFF (50-60s): Hasil + CTA\n\nOUTPUT JSON:\n{\n  \"title\": \"...\",\n  \"scenes\": [\n    {\n      \"scene_number\": 1,\n      \"duration_seconds\": 3,\n      \"voiceover_script\": \"...\",\n      \"visual_prompt\": \"Detail visual untuk AI...\",\n      \"sound_effect_prompt\": \"Sound effects...\"\n    }\n  ]\n}`\n    },\n    {\n      \"role\": \"user\",\n      \"content\": `Topic: ${$json.topic}\n\nGenerate 60-second script dengan 5 scenes.`\n    }\n  ],\n  \"temperature\": 0.7,\n  \"response_format\": { \"type\": \"json_object\" }\n} }}"
       },
       "id": "director-gemini",
       "name": "The Director (Gemini 1.5 Pro)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        450,
+        650,
         300
       ],
       "notes": "Generate script via CometAPI"
@@ -64,7 +78,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        650,
+        850,
         300
       ]
     },
@@ -78,7 +92,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        850,
+        1050,
         300
       ]
     },
@@ -103,14 +117,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"gemini-2.5-flash-image\\\",\\n  \\\"prompt\\\": $json.visual_prompt,\\n  \\\"n\\\": 1,\\n  \\\"size\\\": \\\"1024x1024\\\"\\n} }}"
+        "jsonBody": "={{ {\n  \"model\": \"gemini-2.5-flash-image\",\n  \"prompt\": $json.visual_prompt,\n  \"n\": 1,\n  \"size\": \"1024x1024\"\n} }}"
       },
       "id": "generate-images",
       "name": "Generate Images (Nano Banana)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1050,
+        1250,
         300
       ],
       "notes": "Gemini 2.5 Flash Image via CometAPI"
@@ -124,7 +138,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1250,
+        1450,
         300
       ]
     },
@@ -149,14 +163,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\\n  \\\"model\\\": \\\"veo3\\\",\\n  \\\"prompt\\\": $json.visual_prompt,\\n  \\\"image_url\\\": $json.image_url,\\n  \\\"aspect_ratio\\\": \\\"9:16\\\",\\n  \\\"duration\\\": 5\\n} }}"
+        "jsonBody": "={{ {\n  \"model\": \"veo3\",\n  \"prompt\": $json.visual_prompt,\n  \"image_url\": $json.image_url,\n  \"aspect_ratio\": \"9:16\",\n  \"duration\": 5\n} }}"
       },
       "id": "generate-video-veo",
       "name": "Generate Video (Veo 3)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1450,
+        1650,
         300
       ],
       "notes": "Veo 3 video generation via CometAPI"
@@ -170,7 +184,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1650,
+        1850,
         300
       ]
     },
@@ -184,7 +198,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1850,
+        2050,
         300
       ],
       "webhookId": "auto-generated"
@@ -210,7 +224,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2050,
+        2250,
         300
       ]
     },
@@ -223,7 +237,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2250,
+        2450,
         300
       ]
     },
@@ -238,26 +252,75 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        2450,
+        2650,
         300
       ]
     },
     {
       "parameters": {
-        "jsCode": "// Format final output with preserved metadata and sorted scenes\nconst scenes = ($json.scenes || [])\n  .map((scene) => ({\n    ...scene,\n    scene_number: Number(scene.scene_number),\n    duration_seconds: Number(scene.duration_seconds),\n  }))\n  .sort((a, b) => (a.scene_number || 0) - (b.scene_number || 0));\n\nconst topic = $items('Input: Set Topic')?.[0]?.json?.topic;\nconst title = $items('Parse Script')?.[0]?.json?.title ?? $json.title;\n\nreturn {\n  json: {\n    status: 'completed',\n    topic,\n    title,\n    total_scenes: scenes.length,\n    scenes,\n    video_urls: scenes.map((scene) => scene.video_url).filter(Boolean),\n    created_at: new Date().toISOString(),\n    next_step: 'Download videos and assemble with video editor (manual or Creatomate)',\n  },\n};"
+        "jsCode": "// Format final output with preserved metadata and sorted scenes\nconst scenes = ($json.scenes || [])\n  .map((scene) => ({\n    ...scene,\n    scene_number: Number(scene.scene_number),\n    duration_seconds: Number(scene.duration_seconds),\n  }))\n  .sort((a, b) => (a.scene_number || 0) - (b.scene_number || 0));\n\nconst topic = $items('Set Topic')?.[0]?.json?.topic;\nconst title = $items('Parse Script')?.[0]?.json?.title ?? $json.title;\n\nreturn {\n  json: {\n    status: 'completed',\n    topic,\n    title,\n    total_scenes: scenes.length,\n    scenes,\n    video_urls: scenes.map((scene) => scene.video_url).filter(Boolean),\n    created_at: new Date().toISOString(),\n    next_step: 'Video clips ready! Check Telegram for download links.'\n  },\n};"
       },
       "id": "format-output",
       "name": "Format Final Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2650,
+        2850,
         300
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format message for Telegram\nconst data = $input.item.json;\n\n// Build message\nlet message = `🎬 *Video Baru Selesai!*\\n\\n`;\nmessage += `📝 *Judul:* ${data.title}\\n`;\nmessage += `🎯 *Topic:* ${data.topic}\\n`;\nmessage += `📊 *Total Scenes:* ${data.total_scenes}\\n`;\nmessage += `⏰ *Created:* ${new Date(data.created_at).toLocaleString('id-ID')}\\n\\n`;\nmessage += `📹 *Download Video Clips:*\\n`;\n\ndata.video_urls.forEach((url, index) => {\n  message += `\\n${index + 1}. Scene ${index + 1}:\\n${url}\\n`;\n});\n\nmessage += `\\n✅ *Status:* ${data.status}\\n`;\nmessage += `\\n💡 *Next Step:* Download all clips and combine in video editor (CapCut/DaVinci Resolve)`;\n\nreturn {\n  json: {\n    message: message,\n    parse_mode: 'Markdown'\n  }\n};"
+      },
+      "id": "format-telegram-message",
+      "name": "Format Telegram Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "send-telegram",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3250,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-bot",
+          "name": "Telegram Bot"
+        }
+      },
+      "notes": "Send notification with video links"
     }
   ],
   "connections": {
-    "Input: Set Topic": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Topic": {
       "main": [
         [
           {
@@ -388,6 +451,28 @@
           }
         ]
       ]
+    },
+    "Format Final Output": {
+      "main": [
+        [
+          {
+            "node": "Format Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -402,9 +487,13 @@
     {
       "name": "CometAPI",
       "id": "cometapi"
+    },
+    {
+      "name": "Automated",
+      "id": "automated"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-12-01T11:30:00.000Z",
-  "versionId": "2"
+  "updatedAt": "2025-12-02T05:00:00.000Z",
+  "versionId": "3"
 }
