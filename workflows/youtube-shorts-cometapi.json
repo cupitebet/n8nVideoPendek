@@ -53,10 +53,10 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"model\": \"gemini-1.5-pro\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": `ROLE: Sutradara YouTube Shorts Viral kelas dunia.\n\nTUGAS: Buat naskah 60 detik dengan Conflict Arc.\n\nSTRUKTUR:\n1. HOOK (0-3s): Visual mengejutkan\n2. RISING (3-15s): Perkenalan karakter\n3. CONFLICT (15-30s): Masalah besar\n4. COMEBACK (30-50s): Solusi heroik\n5. PAYOFF (50-60s): Hasil + CTA\n\nOUTPUT JSON:\n{\n  \"title\": \"...\",\n  \"scenes\": [\n    {\n      \"scene_number\": 1,\n      \"duration_seconds\": 3,\n      \"voiceover_script\": \"...\",\n      \"visual_prompt\": \"Detail visual untuk AI...\",\n      \"sound_effect_prompt\": \"Sound effects...\"\n    }\n  ]\n}`\n    },\n    {\n      \"role\": \"user\",\n      \"content\": `Topic: ${$json.topic}\n\nGenerate 60-second script dengan 5 scenes.`\n    }\n  ],\n  \"temperature\": 0.7,\n  \"response_format\": { \"type\": \"json_object\" }\n} }}"
+        "jsonBody": "={{ {\n  \"model\": \"Gemini 3 Pro Preview\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": `ROLE: Sutradara YouTube Shorts Viral kelas dunia.\n\nTUGAS: Buat naskah 60 detik dengan Conflict Arc.\n\nSTRUKTUR:\n1. HOOK (0-3s): Visual mengejutkan\n2. RISING (3-15s): Perkenalan karakter\n3. CONFLICT (15-30s): Masalah besar\n4. COMEBACK (30-50s): Solusi heroik\n5. PAYOFF (50-60s): Hasil + CTA\n\nOUTPUT JSON:\n{\n  \"title\": \"...\",\n  \"scenes\": [\n    {\n      \"scene_number\": 1,\n      \"duration_seconds\": 3,\n      \"voiceover_script\": \"...\",\n      \"visual_prompt\": \"Detail visual untuk AI...\",\n      \"sound_effect_prompt\": \"Sound effects...\"\n    }\n  ]\n}`\n    },\n    {\n      \"role\": \"user\",\n      \"content\": `Topic: ${$json.topic}\n\nGenerate 60-second script dengan 5 scenes.`\n    }\n  ],\n  \"temperature\": 0.7,\n  \"response_format\": { \"type\": \"json_object\" }\n} }}"
       },
       "id": "director-gemini",
-      "name": "The Director (Gemini 1.5 Pro)",
+      "name": "The Director (Gemini 3 Pro Preview)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -69,7 +69,7 @@
           "name": "cometapi"
         }
       },
-      "notes": "Generate script via CometAPI - Uses n8n credential"
+      "notes": "Generate script using Gemini 3 Pro Preview via CometAPI"
     },
     {
       "parameters": {
@@ -115,10 +115,10 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"model\": \"gemini-2.5-flash-image\",\n  \"prompt\": $json.visual_prompt,\n  \"n\": 1,\n  \"size\": \"1024x1024\"\n} }}"
+        "jsonBody": "={{ {\n  \"model\": \"Nano Banana 2\",\n  \"prompt\": $json.visual_prompt,\n  \"n\": 1,\n  \"size\": \"1024x1024\"\n} }}"
       },
       "id": "generate-images",
-      "name": "Generate Images (Nano Banana)",
+      "name": "Generate Images (Nano Banana 2)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -131,7 +131,7 @@
           "name": "cometapi"
         }
       },
-      "notes": "Gemini 2.5 Flash Image via CometAPI - Uses n8n credential"
+      "notes": "Generate images using Nano Banana 2 (Gemini 3 Pro Image) via CometAPI"
     },
     {
       "parameters": {
@@ -163,10 +163,10 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"model\": \"veo3\",\n  \"prompt\": $json.visual_prompt,\n  \"image_url\": $json.image_url,\n  \"aspect_ratio\": \"9:16\",\n  \"duration\": 5\n} }}"
+        "jsonBody": "={{ {\n  \"model\": \"veo 3.1\",\n  \"prompt\": $json.visual_prompt,\n  \"image_url\": $json.image_url,\n  \"aspect_ratio\": \"9:16\",\n  \"duration\": 5\n} }}"
       },
       "id": "generate-video-veo",
-      "name": "Generate Video (Veo 3)",
+      "name": "Generate Video (Veo 3.1)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -179,7 +179,7 @@
           "name": "cometapi"
         }
       },
-      "notes": "Veo 3 video generation via CometAPI - Uses n8n credential"
+      "notes": "Generate videos using Veo 3.1 via CometAPI"
     },
     {
       "parameters": {
@@ -230,7 +230,7 @@
           "name": "cometapi"
         }
       },
-      "notes": "Check video status via CometAPI - Uses n8n credential"
+      "notes": "Check Veo 3.1 video generation status via CometAPI"
     },
     {
       "parameters": {
