@@ -17,7 +17,10 @@
       "name": "Input: Set Topic",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
-      "position": [250, 300]
+      "position": [
+        250,
+        300
+      ]
     },
     {
       "parameters": {
@@ -46,7 +49,10 @@
       "name": "The Director (Gemini 1.5 Pro)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [450, 300],
+      "position": [
+        450,
+        300
+      ],
       "notes": "Generate script via CometAPI"
     },
     {
@@ -57,7 +63,10 @@
       "name": "Parse Script",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [650, 300]
+      "position": [
+        650,
+        300
+      ]
     },
     {
       "parameters": {
@@ -68,7 +77,10 @@
       "name": "Split Scenes",
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
-      "position": [850, 300]
+      "position": [
+        850,
+        300
+      ]
     },
     {
       "parameters": {
@@ -97,7 +109,10 @@
       "name": "Generate Images (Nano Banana)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1050, 300],
+      "position": [
+        1050,
+        300
+      ],
       "notes": "Gemini 2.5 Flash Image via CometAPI"
     },
     {
@@ -108,7 +123,10 @@
       "name": "Extract Image URL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1250, 300]
+      "position": [
+        1250,
+        300
+      ]
     },
     {
       "parameters": {
@@ -137,18 +155,24 @@
       "name": "Generate Video (Veo 3)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1450, 300],
+      "position": [
+        1450,
+        300
+      ],
       "notes": "Veo 3 video generation via CometAPI"
     },
     {
       "parameters": {
-        "jsCode": "// Extract task_id from Veo3 response\nconst response = $input.item.json;\nconst taskId = response.task_id || response.id;\n\nreturn {\n  json: {\n    scene_number: $input.item.json.scene_number,\n    task_id: taskId,\n    voiceover_script: $input.item.json.voiceover_script,\n    duration_seconds: $input.item.json.duration_seconds,\n    status: 'processing'\n  }\n};"
+        "jsCode": "// Preserve scene metadata and extract task_id from Veo3 response\nconst {\n  scene_number,\n  visual_prompt,\n  sound_effect_prompt,\n  voiceover_script,\n  duration_seconds,\n  image_url,\n} = $json;\n\nconst taskId = $json.task_id || $json.id;\n\nreturn {\n  json: {\n    scene_number,\n    visual_prompt,\n    sound_effect_prompt,\n    voiceover_script,\n    duration_seconds,\n    image_url,\n    task_id: taskId,\n    status: 'processing',\n  },\n};"
       },
       "id": "extract-task-id",
       "name": "Extract Task ID",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1650, 300]
+      "position": [
+        1650,
+        300
+      ]
     },
     {
       "parameters": {
@@ -159,7 +183,10 @@
       "name": "Wait for Video Processing",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1850, 300],
+      "position": [
+        1850,
+        300
+      ],
       "webhookId": "auto-generated"
     },
     {
@@ -182,17 +209,23 @@
       "name": "Check Video Status",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2050, 300]
+      "position": [
+        2050,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Extract video URL when ready\nconst response = $input.item.json;\n\nif (response.status === 'completed' && response.video_url) {\n  return {\n    json: {\n      scene_number: $input.item.json.scene_number,\n      video_url: response.video_url,\n      voiceover_script: $input.item.json.voiceover_script,\n      duration_seconds: $input.item.json.duration_seconds,\n      status: 'completed'\n    }\n  };\n} else {\n  throw new Error('Video not ready yet. Status: ' + response.status);\n}"
+        "jsCode": "// Carry forward scene metadata and attach video URL when ready\nconst {\n  scene_number,\n  visual_prompt,\n  sound_effect_prompt,\n  voiceover_script,\n  duration_seconds,\n  image_url,\n  task_id,\n  status,\n  video_url,\n} = $json;\n\nif (status === 'completed' && video_url) {\n  return {\n    json: {\n      scene_number,\n      visual_prompt,\n      sound_effect_prompt,\n      voiceover_script,\n      duration_seconds,\n      image_url,\n      task_id,\n      video_url,\n      status: 'completed',\n    },\n  };\n}\n\nthrow new Error(`Video not ready yet. Status: ${status || 'unknown'} | Task ID: ${task_id || 'missing'}`);"
       },
       "id": "extract-video-url",
       "name": "Extract Video URL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2250, 300]
+      "position": [
+        2250,
+        300
+      ]
     },
     {
       "parameters": {
@@ -204,17 +237,23 @@
       "name": "Aggregate All Scenes",
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
-      "position": [2450, 300]
+      "position": [
+        2450,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Format final output\nconst scenes = $input.item.json.scenes;\n\nreturn {\n  json: {\n    status: 'completed',\n    title: $input.first().json.title,\n    total_scenes: scenes.length,\n    scenes: scenes,\n    video_urls: scenes.map(s => s.video_url),\n    created_at: new Date().toISOString(),\n    next_step: 'Download videos and assemble with video editor (manual or Creatomate)'\n  }\n};"
+        "jsCode": "// Format final output with preserved metadata and sorted scenes\nconst scenes = ($json.scenes || [])\n  .map((scene) => ({\n    ...scene,\n    scene_number: Number(scene.scene_number),\n    duration_seconds: Number(scene.duration_seconds),\n  }))\n  .sort((a, b) => (a.scene_number || 0) - (b.scene_number || 0));\n\nconst topic = $items('Input: Set Topic')?.[0]?.json?.topic;\nconst title = $items('Parse Script')?.[0]?.json?.title ?? $json.title;\n\nreturn {\n  json: {\n    status: 'completed',\n    topic,\n    title,\n    total_scenes: scenes.length,\n    scenes,\n    video_urls: scenes.map((scene) => scene.video_url).filter(Boolean),\n    created_at: new Date().toISOString(),\n    next_step: 'Download videos and assemble with video editor (manual or Creatomate)',\n  },\n};"
       },
       "id": "format-output",
       "name": "Format Final Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2650, 300]
+      "position": [
+        2650,
+        300
+      ]
     }
   ],
   "connections": {
