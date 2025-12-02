@@ -46,10 +46,6 @@
         "headerParameters": {
           "parameters": [
             {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
-            },
-            {
               "name": "Content-Type",
               "value": "application/json"
             }
@@ -67,7 +63,13 @@
         650,
         300
       ],
-      "notes": "Generate script via CometAPI"
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cometapi",
+          "name": "CometAPI"
+        }
+      },
+      "notes": "Generate script via CometAPI - Uses n8n credential"
     },
     {
       "parameters": {
@@ -106,10 +108,6 @@
         "headerParameters": {
           "parameters": [
             {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
-            },
-            {
               "name": "Content-Type",
               "value": "application/json"
             }
@@ -127,7 +125,13 @@
         1250,
         300
       ],
-      "notes": "Gemini 2.5 Flash Image via CometAPI"
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cometapi",
+          "name": "CometAPI"
+        }
+      },
+      "notes": "Gemini 2.5 Flash Image via CometAPI - Uses n8n credential"
     },
     {
       "parameters": {
@@ -152,10 +156,6 @@
         "headerParameters": {
           "parameters": [
             {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
-            },
-            {
               "name": "Content-Type",
               "value": "application/json"
             }
@@ -173,7 +173,13 @@
         1650,
         300
       ],
-      "notes": "Veo 3 video generation via CometAPI"
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cometapi",
+          "name": "CometAPI"
+        }
+      },
+      "notes": "Veo 3 video generation via CometAPI - Uses n8n credential"
     },
     {
       "parameters": {
@@ -208,16 +214,7 @@
         "method": "GET",
         "url": "={{ 'https://api.cometapi.com/v1/video/veo3/video-status?task_id=' + $json.task_id }}",
         "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $env.COMETAPI_KEY }}"
-            }
-          ]
-        }
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "check-video-status",
       "name": "Check Video Status",
@@ -226,7 +223,14 @@
       "position": [
         2250,
         300
-      ]
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cometapi",
+          "name": "CometAPI"
+        }
+      },
+      "notes": "Check video status via CometAPI - Uses n8n credential"
     },
     {
       "parameters": {
