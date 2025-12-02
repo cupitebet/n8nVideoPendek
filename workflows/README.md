@@ -2,9 +2,13 @@
 
 ## 🌟 CometAPI Workflows (RECOMMENDED)
 
+**All workflows use CometAPI for simplicity and ease of use!**
+
+---
+
 ### 1. youtube-shorts-cometapi.json ✅ ⭐
 
-**Full automation workflow via CometAPI** - EASIEST TO USE!
+**Full automation workflow via CometAPI** - PRODUCTION READY!
 
 **Why CometAPI?**
 - ✅ Single API key untuk all models
@@ -17,7 +21,7 @@
 - Gemini 2.5 Flash Image (character images)
 - Veo 3 (video generation)
 
-**Status:** ✅ Available | **12 nodes**
+**Status:** ✅ Production Ready | **12 nodes**
 
 **What it does:**
 1. Input: Topic (e.g., "AI in Gaming")
@@ -39,59 +43,16 @@
 2. Generate character sheet dengan multiple angles
 3. Output: Image URL untuk use in main workflow
 
-**Status:** ✅ Available | **4 nodes**
+**Status:** ✅ Production Ready | **4 nodes**
 
----
-
-## 🔧 Google Cloud Workflows (Advanced Users)
-
-### 3. youtube-shorts-veo-v2.json ✅
-
-**Full automation workflow via Google Cloud Direct**
-
-**For users who:**
-- Need large scale (1000+ videos/month)
-- Want custom quotas
-- Have existing GCP infrastructure
-
-**Models Used:**
-- Google Veo 3.1 (video generation)
-- Gemini 2.5 Flash Image (character images)
-- Gemini 1.5 Pro (script generation)
-- Creatomate (video assembly)
-
-**Status:** ✅ Available | **14 nodes**
-
-**What it does:**
-1. Input: Topic (e.g., "AI Gaming Revolution")
-2. Generate script with Conflict Arc structure
-3. Create character reference images
-4. Generate 5 video clips dengan Veo 3.1
-5. Add voiceover dengan Cloud TTS
-6. Assemble final video dengan subtitles
-7. Output: 60-second YouTube Short ready to upload
-
-**Setup:** [Google Cloud Setup Guide](../docs/GOOGLE-CLOUD-SETUP.md)
-
----
-
-### 4. character-generator.json ✅
-
-**Character sheet generator via Google Cloud**
-
-**What it does:**
-1. Input: Character description
-2. Generate character sheet dengan multiple angles
-3. Upload to Google Cloud Storage
-4. Output: GCS URI untuk use in Veo
-
-**Status:** ✅ Available | **6 nodes**
+**Why use this?**
+- Creates consistent character reference images
+- Multiple angles for better Veo 3 consistency
+- Reusable across multiple videos
 
 ---
 
 ## 🚀 Quick Setup
-
-### For CometAPI (Recommended) ⭐
 
 **Step 1: Get API Key**
 1. Sign up at [CometAPI](https://www.cometapi.com)
@@ -117,16 +78,9 @@
 
 ---
 
-### For Google Cloud (Advanced)
+## 📖 How to Use
 
-**[→ Google Cloud Setup Guide](../docs/GOOGLE-CLOUD-SETUP.md)**
-**[→ Workflow Setup Guide](../docs/WORKFLOW-SETUP.md)**
-
----
-
-## How to Use
-
-### CometAPI Workflow Usage:
+### Main Workflow Usage:
 
 **First Time:**
 1. Import workflow
@@ -144,138 +98,229 @@
 
 ---
 
-### Google Cloud Workflow Usage:
+### Character Generator Usage:
 
-**First Time:**
-1. Import workflow
-2. Configure Google Cloud credentials (see `config/google-credentials-setup.md`)
-3. Update project ID di HTTP Request nodes
-4. Update bucket name di Cloud Storage nodes
-5. Test run
-
-**Regular Use:**
-1. Open workflow
-2. Input topic di Manual Trigger node
-3. Click **Execute Workflow**
-4. Wait 3-5 minutes
-5. Download final video from output node
+**Create a Character:**
+1. Open "Character Generator - CometAPI" workflow
+2. Set character details:
+   - `character_name`: "Alex Chen"
+   - `character_description`: "young Asian male, 22 years old, round glasses, red gaming hoodie"
+3. Execute workflow
+4. Save the `image_url` from output
+5. Use this URL in main workflow for consistent characters!
 
 ---
 
-## Customization
+## 🎨 Customization
 
-### CometAPI Workflows:
+### Script Generation:
+- Edit system prompt in "The Director" node (line 46)
+- Adjust temperature in JSON body (currently 0.7)
 
-**Script Generation:**
-- Edit system prompt in "The Director" node
-- Adjust temperature in JSON body
+**Prompt location:**
+```javascript
+// In "The Director (Gemini 1.5 Pro)" node
+"content": `ROLE: Sutradara YouTube Shorts...`
+```
 
-**Visual Style:**
+### Visual Style:
 - Edit prompts in "Generate Images" node
-- Change image size parameter
+- Change image size parameter (currently 1024x1024)
 
-**Video Settings:**
-- Edit Veo 3 parameters (duration, aspect_ratio)
-- Adjust quality via prompts
+**Models available:**
+- `gemini-2.5-flash-image` (current, recommended)
+- `gemini-1.5-flash-image` (faster, cheaper)
+- Check [CometAPI docs](https://apidoc.cometapi.com) for more
 
-### Google Cloud Workflows:
+### Video Settings:
+- Edit Veo 3 parameters in "Generate Video" node:
+  - `duration`: 5 (seconds)
+  - `aspect_ratio`: "9:16" (for Shorts)
 
-**Script Generation (The Director):**
-- Edit system prompt di Gemini 1.5 Pro node
-- Adjust temperature untuk more/less creative output
-
-**Visual Style:**
-- Edit character sheet template di Image Gen node
-- Change art style keywords
-
-**Video Settings:**
-- Edit Veo 3.1 parameters (videoLength, aspectRatio)
-- Adjust quality settings
-
-**Audio:**
-- Change TTS voice di Cloud TTS node
-- Add background music di Creatomate template
+**Available options:**
+```json
+{
+  "duration": 3-10,
+  "aspect_ratio": "9:16" | "16:9" | "1:1"
+}
+```
 
 ---
 
-## Troubleshooting
+## 🐛 Troubleshooting
 
-### CometAPI Workflows:
-
-**Error: "Invalid API key"**
+### Error: "Invalid API key"
 - Check `.env` file has correct `COMETAPI_KEY`
 - Verify key in CometAPI dashboard
-- Restart n8n to reload environment
+- Restart n8n to reload environment:
+  ```bash
+  docker restart n8n
+  # or
+  n8n stop && n8n start
+  ```
 
-**Error: "Insufficient credits"**
+### Error: "Insufficient credits"
 - Top up credits at [CometAPI Dashboard](https://www.cometapi.com/dashboard)
+- Check current balance and usage
 
-**Workflow fails at specific node:**
-- Check node output for error message
-- Verify API key loaded: Add Code node with `console.log($env.COMETAPI_KEY)`
-- Check CometAPI service status
+### Workflow fails at specific node:
+1. Click failed node
+2. Check **Output** tab for error message
+3. Common issues:
+   - Empty prompts → Check input data
+   - Timeout → Increase wait time in "Wait for Video Processing" node
+   - Invalid format → Check JSON syntax
 
----
+### Images/Videos not generating:
+**Checklist:**
+- ✅ API key valid and has credits
+- ✅ Model names correct: `gemini-2.5-flash-image`, `veo3`
+- ✅ Prompts not empty
+- ✅ CometAPI service status OK
 
-### Google Cloud Workflows:
+**Debug mode:**
+```javascript
+// Add Code node before failed node
+console.log('Input data:', $json);
+return $input.all();
+```
 
-**Workflow fails at Gemini node:**
-- Check credential configured
-- Check API enabled di Google Cloud
-- Check quota limits
-
-**Workflow fails at Veo 3.1 node:**
-- Check project ID correct
-- Check bucket exists
-- Check character reference image URL valid
-
-**Final video has issues:**
-- Check all 5 clips generated successfully
-- Check Creatomate template configured
-- Check subtitle generation working
-
----
-
-## Comparison
-
-| Feature | CometAPI | Google Cloud |
-|---------|----------|--------------|
-| **Setup Time** | 5 minutes | 30+ minutes |
-| **API Keys** | 1 key | Multiple credentials |
-| **Billing** | Simple credits | Complex GCP billing |
-| **Cost (30 videos)** | ~$15-30 | ~$16-20 (after setup) |
-| **Best For** | Quick start, ease of use | Large scale, custom control |
-
-**Recommendation: Start with CometAPI!** ⭐
+### Video processing takes too long:
+- Veo 3 typically takes 30-60 seconds per clip
+- Current wait time: 30 seconds (may need adjustment)
+- If fails, increase wait time to 60 seconds:
+  ```json
+  // In "Wait for Video Processing" node
+  "amount": 60
+  ```
 
 ---
 
-## Old Workflows (Archived)
+## 💰 Cost Estimates (CometAPI)
 
-Old workflows moved to `old/workflows/`:
-- `majelis-digital-marketing.json` - Old Majelis workflow
-- `tuyul-digital-web3.json` - Old crypto content workflow
+### Per Video (5 scenes)
 
-These are **NOT compatible** with Blueprint V2!
+| Component | Usage | Est. Cost |
+|-----------|-------|-----------|
+| Gemini 1.5 Pro (script) | 1 request | ~$0.001 |
+| Gemini 2.5 Flash Image | 5 images | ~$0.01 |
+| Veo 3 (5 clips × 5s) | 25 seconds | ~$0.50-1.00 |
+| **Total per video** | | **~$0.51-1.01** |
+
+### Monthly Estimates
+
+| Videos/Month | Total Cost |
+|--------------|------------|
+| 10 videos | ~$5-10 |
+| 30 videos | ~$15-30 |
+| 100 videos | ~$50-100 |
+
+**Much cheaper than subscriptions ($90+/month)!** 💰
+
+**Cost optimization tips:**
+1. Use shorter clips (3s instead of 5s)
+2. Reduce scenes per video (3-4 instead of 5)
+3. Reuse character sheets across videos
+4. Monitor usage in CometAPI dashboard
 
 ---
 
-## Next Steps
+## 📚 Workflow Architecture
 
-### For CometAPI Users:
+### youtube-shorts-cometapi.json
+
+```
+Input Topic
+    ↓
+┌─────────────────────────────┐
+│  The Director               │
+│  (Gemini 1.5 Pro)          │
+│  - Generate script          │
+└────────────┬────────────────┘
+             ↓
+┌─────────────────────────────┐
+│  Parse Script               │
+│  - Extract scenes           │
+└────────────┬────────────────┘
+             ↓
+┌─────────────────────────────┐
+│  Split Scenes               │
+│  - Process individually     │
+└────────────┬────────────────┘
+             ↓
+    ┌────────────────┐
+    │  For each scene │
+    └────────┬────────┘
+             ↓
+┌─────────────────────────────┐
+│  Generate Images            │
+│  (Gemini 2.5 Flash)        │
+└────────────┬────────────────┘
+             ↓
+┌─────────────────────────────┐
+│  Generate Video (Veo 3)    │
+│  - Image to video           │
+│  - With audio               │
+└────────────┬────────────────┘
+             ↓
+┌─────────────────────────────┐
+│  Wait & Check Status        │
+└────────────┬────────────────┘
+             ↓
+┌─────────────────────────────┐
+│  Aggregate All Scenes       │
+└────────────┬────────────────┘
+             ↓
+      Final Output
+   (Video URLs ready!)
+```
+
+---
+
+## 📦 Old Workflows (Archived)
+
+**Google Cloud Direct workflows moved to `old/workflows/`:**
+- `youtube-shorts-veo-v2.json` - Google Cloud version (archived)
+- `character-generator.json` - Google Cloud version (archived)
+
+**Why archived?**
+- ❌ Complex setup (30+ minutes)
+- ❌ Multiple credentials needed
+- ❌ Complex GCP billing
+- ✅ CometAPI is simpler and faster
+
+**Note:** If you need Google Cloud direct for large scale (1000+ videos/month), workflows are still available in `old/workflows/` but not actively maintained.
+
+---
+
+## 🎯 Next Steps
+
 1. ✅ [Setup CometAPI](../docs/COMETAPI-SETUP.md)
-2. ✅ [Import workflows](#for-cometapi-recommended-)
-3. ✅ [Test run](#cometapi-workflow-usage)
+2. ✅ [Import workflows](#quick-setup)
+3. ✅ [Quick Start Guide](../docs/QUICKSTART.md)
 4. ✅ [Master character consistency](../docs/CHARACTER-CONSISTENCY.md)
+5. ✅ Start creating videos! 🎬
 
-### For Google Cloud Users:
-1. ✅ [Setup Google Cloud](../docs/GOOGLE-CLOUD-SETUP.md)
-2. ✅ [Import workflows](../docs/QUICKSTART.md)
-3. ✅ [Test run](../docs/QUICKSTART.md#step-4-test-run)
-4. ✅ [Master character consistency](../docs/CHARACTER-CONSISTENCY.md)
+---
+
+## 🆘 Need Help?
+
+**Documentation:**
+- 📖 [Quick Start](../docs/QUICKSTART.md)
+- 📖 [CometAPI Setup](../docs/COMETAPI-SETUP.md)
+- 📖 [Character Consistency Guide](../docs/CHARACTER-CONSISTENCY.md)
+
+**External Resources:**
+- 💬 [CometAPI Help Center](https://apidoc.cometapi.com/help-center.md)
+- 📖 [CometAPI Documentation](https://apidoc.cometapi.com)
+- 🎥 [n8n Documentation](https://docs.n8n.io/)
+
+**Community:**
+- 🐛 [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
+- 💬 Discord/Telegram (Coming Soon)
 
 ---
 
 **Happy automating! 🎬**
 
-*Choose CometAPI for easiest setup, or Google Cloud for advanced control!*
+*CometAPI makes AI video creation accessible to everyone!*

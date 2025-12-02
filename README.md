@@ -1,54 +1,43 @@
 # 🎬 Project Blueprint V2: YouTube Shorts Automasi
 
-**Update Desember 2025: Menggunakan Veo 3 dan Gemini 2.5 Flash Image ("Nano Banana") untuk alur kerja yang lebih ringkas dan hemat biaya.**
+**Update Desember 2025: Menggunakan CometAPI dengan Veo 3 dan Gemini 2.5 Flash Image ("Nano Banana") untuk alur kerja yang lebih ringkas dan hemat biaya.**
 
-## 🚀 Two Ways to Get Started
+## 🚀 Quick Start
 
-### Option 1: CometAPI (RECOMMENDED ⭐)
 **Setup Time: 5 minutes | Single API Key | Simple Billing**
 
 ✅ Easiest setup - just one API key
 ✅ Access to Gemini 1.5 Pro, Gemini 2.5 Flash Image, Veo 3
 ✅ Pay-as-you-go dengan credit system
-✅ No complex Google Cloud setup needed
+✅ No complex setup needed
 
-**[→ Start with CometAPI](docs/COMETAPI-SETUP.md)**
-
-### Option 2: Google Cloud Direct
-**Setup Time: 30+ minutes | Multiple Credentials | Complex Billing**
-
-For advanced users who need:
-- Large scale (1000+ videos/month)
-- Custom quotas
-- Full infrastructure control
-
-**[→ Google Cloud Setup](docs/GOOGLE-CLOUD-SETUP.md)**
+**[→ Start Here: CometAPI Setup Guide](docs/COMETAPI-SETUP.md)** ⭐
 
 ---
 
 ## 📋 Daftar Isi
 
-- [Two Ways to Get Started](#-two-ways-to-get-started) ⭐ **Start Here**
+- [Quick Start](#-quick-start) ⭐ **Start Here**
 - [Perubahan Strategi Utama](#1-perubahan-strategi-utama)
-- [Arsitektur Workflow Baru](#2-arsitektur-workflow-baru-n8n-flow)
+- [Arsitektur Workflow](#2-arsitektur-workflow-n8n-flow)
 - [Perbandingan Alat](#3-perbandingan-alat-tech-stack-update)
 - [Langkah Taktis Memulai](#4-langkah-taktis-memulai-untuk-pemula-n8n)
 - [Prompt Rahasia](#5-prompt-rahasia-untuk-nano-banana-gemini-flash-image)
 - [Detail Implementasi Teknis](#6-detail-implementasi-teknis-prompts--json)
-- [Quick Links](#quick-links)
+- [Quick Links](#-quick-links)
 
 ---
 
 ## 1. Perubahan Strategi Utama
 
-Dengan **Veo 3.1**, kita bisa memangkas kerumitan.
+Dengan **Veo 3**, kita bisa memangkas kerumitan.
 
 ### Dulu
 ```
 Text → Image → Video (Bisu) → Generate Suara Terpisah → Edit Gabung
 ```
 
-### Sekarang (Veo 3.1)
+### Sekarang (Veo 3)
 ```
 Text/Image → Video + Audio (SFX & Ambience) sekaligus
 ```
@@ -61,41 +50,38 @@ Text/Image → Video + Audio (SFX & Ambience) sekaligus
 
 ---
 
-## 2. Arsitektur Workflow Baru (n8n Flow)
+## 2. Arsitektur Workflow (n8n Flow)
 
-### Tahap 1: The Director (Tetap Sama)
+### Tahap 1: The Director
 
 **Trigger:** Topik Manual / Tren
 
-**Node 1 (LLM - Gemini 1.5 Pro):**
+**Node 1 (LLM - Gemini 1.5 Pro via CometAPI):**
 - **Tugas:** Menulis naskah dengan struktur **Conflict Arc**
 - **Penting:** Minta output prompt visual yang sangat spesifik untuk konsistensi karakter
   - Contoh: *"A young gamer boy with a red hoodie, anime style"*
 
-### Tahap 2: The Visual Factory (Updated)
+### Tahap 2: The Visual Factory
 
 **Node 2: Image Gen (Karakter & Aset)**
 
-- **Model:** Gemini 2.5 Flash Image ("Nano Banana")
+- **Model:** Gemini 2.5 Flash Image ("Nano Banana") via CometAPI
 - **Kenapa ini?**
   - ✅ Sangat cepat
-  - ✅ Murah
+  - ✅ Murah (~$0.002 per image)
   - ✅ Punya fitur **"Subject Consistency"**
 - **Cara Kerja:**
   1. Generate 1 gambar karakter utama
   2. Pakai gambar itu sebagai referensi untuk shot selanjutnya
   3. Wajah karakter tidak berubah-ubah (masalah utama video AI)
 
-**Alternatif Mudah:**
-- Jika node ini sulit disetting manual, gunakan node **"Google AI Studio"** di n8n dan pilih model `gemini-2.5-flash-image`
-
 **Node 3: Video Gen (The Engine)**
 
-- **Model:** Google Veo 3.1 (via Vertex AI / Gemini API)
+- **Model:** Veo 3 via CometAPI
 
 **Fitur Wajib Pakai:**
 1. **Image-to-Video:** Masukkan gambar dari Node 2
-2. **Native Audio Generation:** Centang opsi audio - Veo 3.1 otomatis membuat:
+2. **Native Audio Generation:** Veo 3 otomatis membuat:
    - Suara langkah kaki
    - Ledakan
    - Angin
@@ -104,39 +90,35 @@ Text/Image → Video + Audio (SFX & Ambience) sekaligus
 
 ### Tahap 3: The Assembly (Penyatuan)
 
-Meskipun Veo hebat, dia menghasilkan klip-klip terpisah (misal 5-10 detik per klip). Kita tetap butuh "Lem" untuk menyatukannya.
+Veo 3 menghasilkan klip-klip terpisah (5-10 detik per klip).
 
-**Node 4 (Voiceover - Opsional):**
-- Veo 3.1 bisa generate dialog, tapi kadang belum sempurna untuk naskah panjang
-- **Saran:** Gunakan **Google Cloud Text-to-Speech (Journey Voice)** untuk Narator utama
-- Biarkan Veo menangani sound effect (suara latar)
-
-**Node 5 (Cloud Editor - Creatomate):**
-- Menggabungkan klip Veo 3.1 + Narasi
-- Menambahkan **Subtitle Otomatis** (wajib untuk Shorts)
-- Menambahkan **musik latar** (background music) yang konsisten
+**Output Final:**
+- Workflow menghasilkan video URLs untuk setiap scene
+- Download dan combine manual di video editor (CapCut, DaVinci Resolve)
+- Atau gunakan Creatomate untuk automated assembly (optional)
 
 ---
 
 ## 3. Perbandingan Alat (Tech Stack Update)
 
-| Fungsi | Alat Lama | Pilihan Baru (Lebih Mudah & Canggih) |
-|--------|-----------|---------------------------------------|
-| **Image Model** | Flux / Midjourney | **Gemini 2.5 Flash Image** ("Nano Banana")<br/>✅ Lebih mudah diintegrasikan di n8n karena native Google |
-| **Video Model** | Runway Gen-3 | **Google Veo 3.1**<br/>✅ Menang di Audio & Konsistensi |
-| **Konsistensi** | Latih LoRA (Rumit) | **Veo "Ingredients"**<br/>✅ Upload gambar karakter, Veo akan menjaganya tetap sama |
-| **Biaya** | Mahal ($90+/bulan untuk berbagai sub) | **Pay-as-you-go**<br/>✅ Bayar per generate via Google Cloud, jauh lebih murah untuk pemula |
+| Fungsi | Alat Lama | Pilihan Baru (CometAPI) |
+|--------|-----------|-------------------------|
+| **Image Model** | Flux / Midjourney | **Gemini 2.5 Flash Image** ("Nano Banana")<br/>✅ Single API, easy integration |
+| **Video Model** | Runway Gen-3 | **Veo 3 via CometAPI**<br/>✅ Menang di Audio & Konsistensi |
+| **Konsistensi** | Latih LoRA (Rumit) | **Character Reference Images**<br/>✅ Upload gambar karakter, Veo akan maintain consistency |
+| **Biaya** | Mahal ($90+/bulan untuk berbagai sub) | **Pay-as-you-go via CometAPI**<br/>✅ ~$0.50-1.00 per video |
+| **Setup** | Complex (multiple APIs) | **Single API key**<br/>✅ 5 minutes setup |
 
 ---
 
 ## 4. Langkah Taktis Memulai (Untuk Pemula n8n)
 
-Jika Anda merasa script n8n rumit, lakukan ini bertahap:
+Jika Anda merasa workflow n8n rumit, lakukan ini bertahap:
 
 ### Level 1 (Semi-Manual)
-1. Gunakan **Google AI Studio** (gratis/murah) di browser
+1. Gunakan **CometAPI Playground** di browser untuk testing
 2. Generate gambar pakai **Gemini 2.5 Flash** ("Nano Banana")
-3. Generate video pakai **Veo 3.1**
+3. Generate video pakai **Veo 3**
 4. Edit manual di **CapCut**
 
 **Lakukan ini untuk 5 video pertama agar paham polanya.**
@@ -146,11 +128,12 @@ Jika Anda merasa script n8n rumit, lakukan ini bertahap:
    - Input Topik
    - Generate 5 Prompt Gambar
    - Generate 5 Gambar (Gemini Flash)
-   - Save to Google Drive
-2. Anda tinggal ambil gambar di Drive, lalu animasikan manual
+   - Save URLs
+2. Anda tinggal download gambar, lalu animasikan dengan Veo 3
 
 ### Level 3 (Full Auto)
-- Baru sambungkan **Veo 3.1** dan **Creatomate** di n8n setelah Level 2 lancar
+- Import workflow lengkap dari `workflows/youtube-shorts-cometapi.json`
+- Tinggal input topic, klik Execute, tunggu hasil! 🎉
 
 ---
 
@@ -170,7 +153,7 @@ distinct round glasses, wearing red gaming hoodie with logo, front view, side vi
 back view, flat lighting, neutral background.
 ```
 
-**Gunakan hasil "Character Sheet" ini sebagai Reference Image saat meminta Veo 3.1 membuat video.**
+**Gunakan hasil "Character Sheet" ini sebagai Reference Image saat meminta Veo 3 membuat video.**
 
 ---
 
@@ -180,7 +163,7 @@ Bagian ini bisa Anda copy-paste langsung ke dalam node n8n Anda.
 
 ### A. System Prompt untuk "The Director" (Node Gemini 1.5 Pro)
 
-Isi ini di bagian **System Instruction** pada node Google Gemini Chat di n8n.
+Isi ini di bagian **System Instruction** pada node HTTP Request ke CometAPI.
 
 ```
 ROLE: Anda adalah Sutradara YouTube Shorts Viral kelas dunia yang ahli dalam "Conflict Arc Storytelling".
@@ -204,43 +187,64 @@ Hanya berikan output JSON mentah tanpa markdown ```json.
       "duration_seconds": 3,
       "voiceover_script": "Teks yang dibaca narator...",
       "visual_prompt": "Deskripsi visual SANGAT DETAIL untuk AI Image Generator. Jelaskan subjek, aksi, pencahayaan, dan sudut kamera (misal: low angle, cinematic lighting).",
-      "sound_effect_prompt": "Deskripsi suara latar untuk Veo 3.1 (misal: loud explosion, fast footsteps)"
+      "sound_effect_prompt": "Deskripsi suara latar untuk Veo 3 (misal: loud explosion, fast footsteps)"
     },
     ... (lanjutkan sampai selesai)
   ]
 }
 ```
 
-### B. Konfigurasi Node Veo 3.1 (HTTP Request)
+**File lengkap:** `prompts/director-system-prompt.txt`
 
-Jika belum ada node resmi Veo, gunakan **HTTP Request** ke Vertex AI.
+### B. Konfigurasi CometAPI Requests
 
-**Method:** `POST`
+**Untuk Script Generation (Gemini 1.5 Pro):**
+```bash
+POST https://api.cometapi.com/v1/chat/completions
+Authorization: Bearer YOUR_COMETAPI_KEY
 
-**URL:**
-```
-https://us-central1-aiplatform.googleapis.com/v1/projects/[YOUR_PROJECT_ID]/locations/us-central1/publishers/google/models/veo-003-1:predict
-```
-
-**Body (JSON):**
-```json
 {
-  "instances": [
-    {
-      "prompt": "{{ $json.visual_prompt }}",
-      "image_storage_uri": "gs://[bucket_name]/[character_ref_image.png]",
-      "audio_prompt": "{{ $json.sound_effect_prompt }}"
-    }
-  ],
-  "parameters": {
-    "sampleCount": 1,
-    "videoLength": "5s",
-    "aspectRatio": "9:16"
-  }
+  "model": "gemini-1.5-pro",
+  "messages": [...],
+  "temperature": 0.7,
+  "response_format": { "type": "json_object" }
 }
 ```
 
-**Catatan:** Pastikan Anda mengganti variabel dengan expression n8n yang sesuai.
+**Untuk Image Generation (Gemini 2.5 Flash Image):**
+```bash
+POST https://api.cometapi.com/v1/images/generations
+Authorization: Bearer YOUR_COMETAPI_KEY
+
+{
+  "model": "gemini-2.5-flash-image",
+  "prompt": "your visual prompt here",
+  "n": 1,
+  "size": "1024x1024"
+}
+```
+
+**Untuk Video Generation (Veo 3):**
+```bash
+POST https://api.cometapi.com/v1/video/veo3/video-create
+Authorization: Bearer YOUR_COMETAPI_KEY
+
+{
+  "model": "veo3",
+  "prompt": "your visual prompt",
+  "image_url": "url from image generation",
+  "aspect_ratio": "9:16",
+  "duration": 5
+}
+```
+
+**Check status:**
+```bash
+GET https://api.cometapi.com/v1/video/veo3/video-status?task_id=TASK_ID
+Authorization: Bearer YOUR_COMETAPI_KEY
+```
+
+**Catatan:** Semua API calls sudah ter-implement di workflow JSON. Anda tinggal import!
 
 ### C. Contoh Workflow JSON Output
 
@@ -268,33 +272,47 @@ Hasil dari Node 1 (The Director) akan seperti ini:
 }
 ```
 
+**File contoh lengkap:** `examples/sample-script-output.json`
+
 ---
 
-## 📊 Estimasi Biaya
+## 📊 Estimasi Biaya (CometAPI)
 
-### Google Cloud (Pay-as-you-go)
+### Per Video (5 scenes, 60 seconds total)
 
-| Service | Cost per Unit | Monthly (30 videos) |
-|---------|---------------|---------------------|
-| Gemini 1.5 Pro (Script) | ~$0.001/request | ~$0.03 |
-| Gemini 2.5 Flash Image | ~$0.0005/image | ~$0.075 (5 images/video) |
-| Veo 3.1 Video | ~$0.10/video clip | ~$15 (5 clips/video) |
-| Text-to-Speech | ~$0.000016/char | ~$0.48 |
-| Cloud Storage | ~$0.02/GB | ~$0.60 |
-| **TOTAL** | | **~$16.19/month** |
+| Service | Cost per Unit | Per Video |
+|---------|---------------|-----------|
+| Gemini 1.5 Pro (Script) | ~$0.001/request | ~$0.001 |
+| Gemini 2.5 Flash Image (5 images) | ~$0.002/image | ~$0.010 |
+| Veo 3 Video (5 clips × 5s) | ~$0.10-0.20/clip | ~$0.50-1.00 |
+| **TOTAL per video** | | **~$0.51-1.01** |
+
+### Monthly Cost Estimates
+
+| Videos/Month | Total Cost |
+|--------------|------------|
+| 10 videos | ~$5-10 |
+| 30 videos | ~$15-30 |
+| 100 videos | ~$50-100 |
 
 **Jauh lebih murah** dibanding subscription model ($90+/month)!
 
+**Cost Optimization Tips:**
+1. Reuse character sheets across multiple videos
+2. Use shorter clips (3-5s instead of 8-10s)
+3. Reduce scenes per video if possible
+4. Monitor CometAPI dashboard for usage
+
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-1. **CometAPI Account** (recommended) atau Google Cloud Account
+1. **CometAPI Account** - [Sign up here](https://www.cometapi.com)
 2. **n8n Instance** (Cloud atau self-hosted)
-3. **API Key** dari CometAPI atau Google Cloud credentials
+3. **API Key** dari CometAPI dashboard
 
-### Setup Steps (CometAPI - Recommended)
+### Setup Steps (5 minutes) ⚡
 
 ```bash
 # 1. Clone repository
@@ -307,7 +325,7 @@ cd n8nVideoPendek
 
 # 3. Setup environment
 cp config/environment-variables-cometapi.env.example .env
-# Edit .env dan isi COMETAPI_KEY
+# Edit .env dan isi COMETAPI_KEY=your-key-here
 
 # 4. Install n8n (via Docker)
 docker run -d --name n8n -p 5678:5678 \
@@ -325,9 +343,7 @@ docker run -d --name n8n -p 5678:5678 \
 # Just click Execute - API key loaded from .env
 ```
 
-**[→ Detailed CometAPI Setup Guide](docs/COMETAPI-SETUP.md)**
-
-**[→ Google Cloud Setup (Advanced)](docs/GOOGLE-CLOUD-SETUP.md)**
+**[→ Detailed Setup Guide](docs/COMETAPI-SETUP.md)**
 
 ### Test Your First Video
 
@@ -338,14 +354,14 @@ docker run -d --name n8n -p 5678:5678 \
    - ✅ Script generated
    - ✅ Character images created
    - ✅ Video clips generated
-   - ✅ Final video assembled
+   - ✅ Video URLs ready for download
 
 ---
 
 ## 🎯 Best Practices
 
 ### 1. Character Consistency
-- Always create a "Character Sheet" first
+- Always create a "Character Sheet" first using `character-generator-cometapi.json`
 - Use the same character reference for all clips
 - Keep character descriptions detailed but consistent
 
@@ -353,7 +369,7 @@ docker run -d --name n8n -p 5678:5678 \
 - Be specific with visual descriptions
 - Include camera angles and lighting
 - Mention mood and atmosphere
-- Add sound effect descriptions for Veo 3.1
+- Add sound effect descriptions for Veo 3
 
 ### 3. Video Structure
 - Keep HOOK under 3 seconds
@@ -364,27 +380,32 @@ docker run -d --name n8n -p 5678:5678 \
 ### 4. Cost Optimization
 - Start with Level 1 (manual) to learn the pattern
 - Test prompts before full automation
-- Use Gemini Flash Image (cheaper) instead of Pro
-- Monitor Google Cloud billing alerts
+- Reuse character sheets across videos
+- Monitor CometAPI billing dashboard
 
 ---
 
 ## 📚 Additional Resources
 
 ### Documentation
-- [Google Veo 3.1 Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/video/overview)
-- [Gemini 2.5 Flash Image Guide](https://ai.google.dev/gemini-api/docs/vision)
-- [n8n Workflow Best Practices](https://docs.n8n.io/workflows/best-practices/)
+- [CometAPI Setup Guide](docs/COMETAPI-SETUP.md) ⭐ **Start here**
+- [Quick Start Guide](docs/QUICKSTART.md)
+- [Character Consistency Guide](docs/CHARACTER-CONSISTENCY.md)
+- [Workflows README](workflows/README.md)
 
-### Example Workflows
-- `workflows/youtube-shorts-veo-v2.json` - Full automation workflow
-- `workflows/youtube-shorts-manual.json` - Semi-manual workflow for beginners
-- `examples/sample-scripts/` - Example video scripts
+### Example Files
+- [Sample Script Output](examples/sample-script-output.json)
+- [Sample Character Sheet](examples/sample-character-sheet.json)
 
 ### Templates
-- `prompts/director-prompt.txt` - The Director system prompt
-- `prompts/character-sheet-template.txt` - Character consistency template
-- `config/veo-settings.json` - Veo 3.1 configuration template
+- [Director System Prompt](prompts/director-system-prompt.txt)
+- [Character Sheet Template](prompts/character-sheet-template.txt)
+- [Visual Prompt Template](prompts/visual-prompt-template.txt)
+
+### External Links
+- [CometAPI Documentation](https://apidoc.cometapi.com)
+- [CometAPI Pricing](https://api.cometapi.com/pricing)
+- [n8n Workflow Best Practices](https://docs.n8n.io/workflows/best-practices/)
 
 ---
 
@@ -392,25 +413,27 @@ docker run -d --name n8n -p 5678:5678 \
 
 ### Common Issues
 
-**Error: "Quota exceeded" pada Veo 3.1**
-- ✅ Check Google Cloud quota limits
-- ✅ Request quota increase di console
-- ✅ Reduce video generation frequency
+**Error: "Invalid API key"**
+- ✅ Check `.env` file has correct `COMETAPI_KEY`
+- ✅ Verify key in CometAPI dashboard
+- ✅ Restart n8n: `docker restart n8n`
+
+**Error: "Insufficient credits"**
+- ✅ Top up credits at [CometAPI Dashboard](https://www.cometapi.com/dashboard)
 
 **Karakter tidak konsisten antar klip**
-- ✅ Pastikan menggunakan character reference image
+- ✅ Gunakan character generator workflow first
 - ✅ Gunakan prompt yang lebih spesifik
-- ✅ Tambahkan "Subject Consistency" di Gemini Flash
+- ✅ Include detailed character descriptions in every prompt
 
-**Audio tidak sinkron dengan video**
-- ✅ Gunakan Veo 3.1 native audio untuk SFX
-- ✅ Tambahkan voiceover terpisah via TTS
-- ✅ Edit manual di Creatomate jika perlu
+**Video processing timeout**
+- ✅ Increase wait time in workflow (currently 30s)
+- ✅ Veo 3 typically takes 30-60 seconds per clip
 
 **Video quality rendah**
 - ✅ Gunakan prompt yang lebih detail
-- ✅ Specify "high quality, 4K, cinematic" di prompt
-- ✅ Adjust Veo 3.1 quality settings
+- ✅ Specify "high quality, cinematic" di prompt
+- ✅ Use better lighting descriptions
 
 ---
 
@@ -418,13 +441,13 @@ docker run -d --name n8n -p 5678:5678 \
 
 ### Phase 1: Foundation ✅
 - [x] Blueprint V2 documentation
+- [x] CometAPI integration
 - [x] Basic workflow structure
-- [x] Google Cloud integration guide
 - [x] Cost estimation
 
-### Phase 2: Automation 🚧
-- [ ] Complete n8n workflow JSON
-- [ ] Character consistency system
+### Phase 2: Enhancement 🚧
+- [x] Complete n8n workflow JSON
+- [x] Character consistency system
 - [ ] Automated subtitle generation
 - [ ] Music library integration
 
@@ -455,7 +478,7 @@ Kontribusi sangat welcome!
 
 ### Areas to Contribute:
 - 🐛 Bug fixes
-- ✨ New features (Veo 3.1 optimizations)
+- ✨ New features (Veo 3 optimizations)
 - 📝 Documentation improvements
 - 🎨 Prompt template library
 - 🔧 New integrations
@@ -473,9 +496,9 @@ MIT License - feel free to use, modify, distribute!
 
 **Built with:**
 - [n8n](https://n8n.io) - Workflow automation
-- [Google Veo 3.1](https://deepmind.google/technologies/veo/) - Video generation
+- [CometAPI](https://www.cometapi.com) - AI Models aggregator
+- [Google Veo 3](https://deepmind.google/technologies/veo/) - Video generation
 - [Gemini 2.5 Flash](https://ai.google.dev/gemini-api) - Image & text generation
-- [Creatomate](https://creatomate.com) - Video editing automation
 
 **Created by:** Cupi & Claude AI
 
@@ -486,20 +509,21 @@ MIT License - feel free to use, modify, distribute!
 - 📖 **Documentation:** [docs/](docs/)
 - 💬 **Issues:** [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
 - 📧 **Email:** [Contact Support]
-- 💬 **Community:** [Join Discord/Telegram]
+- 💬 **Community:** Discord/Telegram (Coming Soon)
 
 ---
 
 ## ⚡ Quick Links
 
-- [Quick Start Guide](#quick-start) - Setup dalam 10 menit
-- [Tech Stack Comparison](#3-perbandingan-alat-tech-stack-update) - Lihat perbandingan tools
-- [Prompt Templates](#6-detail-implementasi-teknis-prompts--json) - Copy-paste prompts
-- [Cost Calculator](#estimasi-biaya) - Hitung biaya operasional
-- [Troubleshooting Guide](#troubleshooting) - Solusi masalah umum
+- [Quick Start Guide](docs/COMETAPI-SETUP.md) ⭐ **Setup dalam 5 menit**
+- [Tech Stack Comparison](#3-perbandingan-alat-tech-stack-update)
+- [Prompt Templates](#6-detail-implementasi-teknis-prompts--json)
+- [Cost Calculator](#-estimasi-biaya-cometapi)
+- [Troubleshooting Guide](#-troubleshooting)
+- [Workflows Documentation](workflows/README.md)
 
 ---
 
 **Happy Creating! 🎬**
 
-*"From Idea to Viral Shorts in Minutes, Not Hours" - YouTube Shorts Automasi V2*
+*"From Idea to Viral Shorts in Minutes, Not Hours" - YouTube Shorts Automasi V2 powered by CometAPI*

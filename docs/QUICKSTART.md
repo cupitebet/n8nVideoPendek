@@ -1,217 +1,417 @@
-# ⚡ Quick Start - Blueprint V2
+# ⚡ Quick Start Guide - Blueprint V2
 
-**Target: Dari nol ke video pertama dalam 30 menit**
+**From zero to your first AI-generated video in 15 minutes!**
 
 ---
 
 ## Prerequisites
 
-Sebelum mulai, pastikan Anda punya:
-
-1. ✅ **Google Cloud Account** dengan billing enabled
-2. ✅ **n8n** (Cloud atau self-hosted)
-3. ✅ Akses ke:
-   - Vertex AI API
-   - Gemini API
-   - Cloud Text-to-Speech API (optional)
+Before starting, make sure you have:
+- ✅ Computer with Docker installed (or npm for n8n)
+- ✅ Internet connection
+- ✅ Credit card for CometAPI signup (~$5-10 initial credit recommended)
 
 ---
 
-## Step 1: Setup Google Cloud (15 menit)
+## Step 1: Get CometAPI Access (3 minutes)
 
-### 1.1 Enable APIs
+### 1.1 Sign Up
 
-```bash
-# Login ke Google Cloud Console
-# https://console.cloud.google.com
+1. Go to [https://www.cometapi.com](https://www.cometapi.com)
+2. Click **Sign Up**
+3. Use email or Google account
+4. Verify your email
 
-# Enable APIs yang dibutuhkan:
-# - Vertex AI API
-# - Generative Language API (Gemini)
-# - Cloud Text-to-Speech API
+### 1.2 Add Credits
+
+1. Navigate to **Dashboard** → **Billing**
+2. Click **Add Credits**
+3. Add $10 (enough for 10-20 videos)
+4. Complete payment
+
+### 1.3 Get API Key
+
+1. Go to **Dashboard** → **API Keys**
+2. Click **Create New Key**
+3. Name it: `n8n-youtube-shorts`
+4. **Copy the key** - it only shows once!
+
+```
+Example: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-Di Console:
-1. Pergi ke **APIs & Services** > **Enable APIs**
-2. Search dan enable:
-   - ✅ Vertex AI API
-   - ✅ Generative Language API
-   - ✅ Cloud Text-to-Speech API
-
-### 1.2 Create Service Account
-
-```bash
-# Di Google Cloud Console:
-# IAM & Admin > Service Accounts > Create Service Account
-
-# Berikan permissions:
-# - Vertex AI User
-# - Cloud Storage Admin (untuk menyimpan video)
-# - Service Account Token Creator
-```
-
-### 1.3 Download JSON Key
-
-1. Klik service account yang baru dibuat
-2. **Keys** tab > **Add Key** > **Create New Key**
-3. Pilih **JSON**
-4. Download file (simpan dengan aman!)
+⚠️ **Save this key somewhere safe!**
 
 ---
 
-## Step 2: Setup n8n (5 menit)
+## Step 2: Setup n8n (5 minutes)
 
-### 2.1 Install n8n
+### Option A: Docker (Recommended)
 
-**Via Docker (Recommended):**
 ```bash
-docker run -d --name n8n \
+# 1. Clone the repository
+git clone https://github.com/cupitebet/n8nVideoPendek.git
+cd n8nVideoPendek
+
+# 2. Create .env file
+cp config/environment-variables-cometapi.env.example .env
+
+# 3. Edit .env and add your API key
+nano .env
+# Change: COMETAPI_KEY=your-key-here
+
+# 4. Start n8n with Docker
+docker run -d \
+  --name n8n \
   -p 5678:5678 \
   -v ~/.n8n:/home/node/.n8n \
+  --env-file .env \
   n8nio/n8n
+
+# 5. Wait 30 seconds for startup
+sleep 30
 ```
 
-**Via npm:**
+### Option B: npm
+
 ```bash
-npm install n8n -g
+# 1. Install n8n globally
+npm install -g n8n
+
+# 2. Set environment variable
+export COMETAPI_KEY=your-key-here
+
+# 3. Start n8n
 n8n start
 ```
 
-### 2.2 Access n8n
+### Verify n8n is Running
 
-Buka browser: `http://localhost:5678`
-
----
-
-## Step 3: Import Workflow (5 menit)
-
-### 3.1 Download Workflow
-
-File workflow ada di: `workflows/youtube-shorts-veo-v2.json`
-
-### 3.2 Import ke n8n
-
-1. Di n8n, klik **Workflows** menu
-2. Klik **Import from File**
-3. Upload `youtube-shorts-veo-v2.json`
-4. Workflow akan terbuka otomatis
-
-### 3.3 Setup Credentials
-
-**Google Cloud Credential:**
-1. Klik node "Gemini 1.5 Pro" atau "Veo 3.1"
-2. Di credential dropdown, pilih **Create New**
-3. Pilih **Google Service Account**
-4. Upload JSON key yang sudah didownload di Step 1.3
-
-**Ulangi untuk semua node Google:**
-- ✅ Gemini 1.5 Pro (The Director)
-- ✅ Gemini 2.5 Flash Image (Image Generator)
-- ✅ Veo 3.1 (Video Generator)
-- ✅ Cloud TTS (Text-to-Speech) - optional
+1. Open browser
+2. Go to: `http://localhost:5678`
+3. You should see n8n interface
 
 ---
 
-## Step 4: Test Run (5 menit)
+## Step 3: Import Workflows (2 minutes)
 
-### 4.1 Set Input Topic
+### 3.1 Import Main Workflow
 
-1. Cari node **"Manual Trigger"** di awal workflow
-2. Klik node tersebut
-3. Di bagian **Parameters**, isi:
-   - **topic**: `"AI Revolution in Gaming"`
+1. In n8n, click **Workflows** (top left)
+2. Click **Import from File**
+3. Navigate to `workflows/youtube-shorts-cometapi.json`
+4. Click **Open**
+5. Workflow should load with 12 nodes
 
-### 4.2 Execute Workflow
+### 3.2 Import Character Generator (Optional)
 
-1. Klik tombol **Execute Workflow** (pojok kanan bawah)
-2. Tunggu proses berjalan (3-5 menit)
-3. Lihat output di setiap node
+1. Click **Workflows** → **Import from File**
+2. Select `workflows/character-generator-cometapi.json`
+3. Click **Open**
 
-### 4.3 Check Results
+---
 
-Hasil yang diharapkan:
+## Step 4: Create Your First Video! (5 minutes)
 
-**Node 1 (The Director):**
-```json
-{
-  "title": "AI Mengubah Gaming Selamanya!",
-  "scenes": [
-    {
-      "scene_number": 1,
-      "duration_seconds": 3,
-      "voiceover_script": "...",
-      "visual_prompt": "...",
-      "sound_effect_prompt": "..."
-    }
-  ]
-}
-```
+### 4.1 Open Main Workflow
 
-**Node 2 (Gemini Flash Image):**
-- ✅ Character reference images generated
-- ✅ Scene images created
+1. Click on **"YouTube Shorts - Blueprint V2 (CometAPI)"** workflow
+2. You'll see all 12 nodes connected
 
-**Node 3 (Veo 3.1):**
-- ✅ Video clips generated (with audio!)
-- ✅ URLs to download videos
+### 4.2 Set Your Topic
 
-**Node 5 (Final Assembly):**
-- ✅ Complete 60-second video
-- ✅ With subtitles and background music
+1. Click on the **"Input: Set Topic"** node (first node)
+2. In the right panel, you'll see:
+   ```json
+   {
+     "topic": "AI in Gaming"
+   }
+   ```
+3. Change topic to something you want:
+   ```json
+   {
+     "topic": "Cara AI Mengubah Dunia Marketing"
+   }
+   ```
+
+### 4.3 Execute Workflow
+
+1. Click **"Execute Workflow"** button (top right)
+2. Watch the magic happen! 🎉
+
+**What happens:**
+- Node 1: Generates script (~5 seconds)
+- Node 2: Parses script
+- Nodes 3-6: Generates images for each scene (~10 seconds each)
+- Nodes 7-10: Generates videos for each scene (~30-60 seconds each)
+- Node 11-12: Aggregates and formats output
+
+**Total time: 2-3 minutes**
+
+### 4.4 Check Results
+
+1. Click on the last node: **"Format Final Output"**
+2. Click **"Output"** tab
+3. You'll see:
+   ```json
+   {
+     "status": "completed",
+     "topic": "Cara AI Mengubah Dunia Marketing",
+     "title": "AI Merevolusi Marketing! Wow!",
+     "total_scenes": 5,
+     "video_urls": [
+       "https://...",
+       "https://...",
+       "https://...",
+       "https://...",
+       "https://..."
+     ]
+   }
+   ```
+
+### 4.5 Download Videos
+
+1. Copy each URL from `video_urls` array
+2. Open in browser
+3. Right-click → **Save Video As...**
+4. Save all 5 clips
+
+---
+
+## Step 5: Combine Videos (Optional)
+
+### Option A: Manual (Free)
+
+**Using CapCut:**
+1. Download [CapCut](https://www.capcut.com/) (free)
+2. Import all 5 video clips
+3. Drag to timeline in order
+4. Add transitions between clips (optional)
+5. Add subtitles (auto-caption feature)
+6. Add background music
+7. Export as 9:16 (Shorts format)
+
+**Using DaVinci Resolve:**
+1. Import clips
+2. Arrange in timeline
+3. Add effects/transitions
+4. Export
+
+### Option B: Automated (Advanced)
+
+Use Creatomate (requires separate account):
+- Coming soon in future updates
+
+---
+
+## Step 6: Upload to YouTube Shorts!
+
+1. Go to [YouTube Studio](https://studio.youtube.com)
+2. Click **Create** → **Upload Video**
+3. Select your combined video
+4. Set as **Short** (YouTube detects 9:16 ratio)
+5. Add title from workflow output
+6. Add description and tags
+7. Publish!
+
+---
+
+## 🎉 Congratulations!
+
+You've just created your first AI-generated YouTube Short!
 
 ---
 
 ## Troubleshooting
 
-### Error: "API not enabled"
-- ✅ Pastikan semua APIs sudah di-enable di Google Cloud Console
-- ✅ Tunggu 1-2 menit setelah enable
+### Workflow Fails at "The Director" Node
 
-### Error: "Quota exceeded"
-- ✅ Check quota limits di Google Cloud Console
-- ✅ Request quota increase jika perlu
+**Error:** "Invalid API key"
 
-### Error: "Permission denied"
-- ✅ Pastikan Service Account punya permissions yang benar
-- ✅ Re-create credential di n8n dengan JSON key yang baru
+**Solution:**
+```bash
+# Check .env file
+cat .env | grep COMETAPI_KEY
 
-### Video tidak generate
-- ✅ Check output Node 1 - pastikan JSON valid
-- ✅ Check Node 2 - pastikan images ter-generate
-- ✅ Check Veo 3.1 node configuration
+# Should show: COMETAPI_KEY=sk-xxx...
+# If empty or wrong, edit:
+nano .env
+
+# Then restart n8n:
+docker restart n8n
+# or
+n8n stop && n8n start
+```
+
+### Workflow Fails at "Generate Images" Node
+
+**Error:** "Insufficient credits"
+
+**Solution:**
+1. Go to [CometAPI Dashboard](https://www.cometapi.com/dashboard)
+2. Check balance
+3. Top up credits if needed
+
+### Video Generation Takes Too Long
+
+**Issue:** Veo 3 is taking >2 minutes per clip
+
+**Solution:**
+- This is normal! Veo 3 typically takes 30-90 seconds per clip
+- Total workflow time: 2-5 minutes for 5 clips
+- Be patient ☕
+
+### Videos Don't Match Character Description
+
+**Issue:** Character looks different in each scene
+
+**Solution:**
+1. Use the **Character Generator** workflow first
+2. Create a character sheet
+3. Reuse the character image URL in prompts
+
+See: [Character Consistency Guide](CHARACTER-CONSISTENCY.md)
 
 ---
 
 ## Next Steps
 
-Setelah berhasil test run pertama:
+### Level Up Your Skills
 
-1. 📖 **Customize Prompts** - Lihat [Prompt Guide](PROMPT-GUIDE.md)
-2. 🎨 **Character Consistency** - Lihat [Character Guide](CHARACTER-CONSISTENCY.md)
-3. ⚙️ **Optimize Settings** - Lihat [Configuration Guide](CONFIGURATION.md)
-4. 🚀 **Production Setup** - Lihat [Production Guide](PRODUCTION-SETUP.md)
+**Now that you've created your first video:**
+
+1. ✅ Read [Character Consistency Guide](CHARACTER-CONSISTENCY.md)
+   - Master creating consistent characters
+   - Learn advanced prompt engineering
+
+2. ✅ Study the prompts
+   - Open `prompts/director-system-prompt.txt`
+   - Understand Conflict Arc structure
+   - Customize for your niche
+
+3. ✅ Experiment with topics
+   - Try different niches
+   - Test different video lengths
+   - A/B test titles
+
+4. ✅ Create 10 videos
+   - Practice makes perfect
+   - Learn what works
+   - Build your content library
+
+### Optimize Your Workflow
+
+**Cost Optimization:**
+- Reuse character sheets
+- Use shorter clips (3s instead of 5s)
+- Reduce scenes per video (3-4 instead of 5)
+
+**Quality Optimization:**
+- Study high-performing Shorts
+- Improve prompt specificity
+- Add better sound effect descriptions
+- Use consistent art style
+
+**Speed Optimization:**
+- Batch process multiple topics
+- Create character library upfront
+- Use templates for common topics
 
 ---
 
-## Cost Estimate untuk Test Run
+## Common Customizations
 
-- Gemini 1.5 Pro (1 request): ~$0.001
-- Gemini 2.5 Flash Image (5 images): ~$0.0025
-- Veo 3.1 (5 video clips): ~$0.50
-- Cloud TTS (500 chars): ~$0.008
-- **Total per test**: ~$0.51
+### Change Video Length
 
-**Sangat murah untuk test!** 🎉
+Edit "duration" in **"Generate Video (Veo 3)"** node:
+
+```json
+{
+  "duration": 3  // Change from 5 to 3 seconds
+}
+```
+
+### Change Aspect Ratio
+
+For Instagram Reels or TikTok (same as Shorts):
+```json
+{
+  "aspect_ratio": "9:16"  // Already default
+}
+```
+
+For YouTube regular videos:
+```json
+{
+  "aspect_ratio": "16:9"
+}
+```
+
+For Instagram Posts:
+```json
+{
+  "aspect_ratio": "1:1"
+}
+```
+
+### Change Script Temperature
+
+In **"The Director"** node, change temperature:
+
+```json
+{
+  "temperature": 0.9  // More creative (default: 0.7)
+}
+```
+
+Or:
+
+```json
+{
+  "temperature": 0.3  // More conservative
+}
+```
 
 ---
 
-## Support
+## Cost Estimate for First Video
 
-Butuh bantuan?
+Per video (5 scenes):
+- Gemini 1.5 Pro (script): ~$0.001
+- Gemini 2.5 Flash Image (5 images): ~$0.010
+- Veo 3 (5 clips × 5s): ~$0.50-1.00
+- **Total**: ~$0.51-1.01
+
+**Very affordable for testing!** 🎉
+
+---
+
+## Resources
+
+### Documentation
+- [CometAPI Setup Guide](COMETAPI-SETUP.md) - Detailed setup
+- [Character Consistency Guide](CHARACTER-CONSISTENCY.md) - Master consistency
+- [Workflows README](../workflows/README.md) - Workflow details
+
+### Examples
+- [Sample Script Output](../examples/sample-script-output.json)
+- [Sample Character Sheet](../examples/sample-character-sheet.json)
+
+### External
+- [CometAPI Docs](https://apidoc.cometapi.com) - Official API docs
+- [n8n Docs](https://docs.n8n.io/) - n8n help
+- [Veo 3 Guide](https://apidoc.cometapi.com/video/veo3/video-create.md) - Veo 3 details
+
+---
+
+## Need Help?
+
+- 🐛 [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
+- 💬 [CometAPI Help Center](https://apidoc.cometapi.com/help-center.md)
 - 📖 [Full Documentation](README.md)
-- 🐛 [Troubleshooting Guide](TROUBLESHOOTING.md)
-- 💬 [GitHub Issues](https://github.com/cupitebet/n8nVideoPendek/issues)
 
 ---
 
-**Selamat! Video pertama Anda siap! 🎬**
+**Happy Creating! 🎬**
+
+*You're now ready to create unlimited YouTube Shorts with AI!*
